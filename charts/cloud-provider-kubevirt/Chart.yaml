@@ -1,0 +1,9 @@
+apiVersion: v2
+name: cloud-provider-kubevirt
+description: Cloud Provider KubeVirt — Kubernetes cloud provider for nested clusters
+type: application
+version: 0.6.0
+appVersion: "0.6.0"
+kubeVersion: ">=1.30.0-0"
+sources:
+  - https://github.com/kubevirt/cloud-provider-kubevirt

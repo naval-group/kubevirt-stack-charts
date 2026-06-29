@@ -1,0 +1,93 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forklift-operator
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: forklift
+    control-plane: forklift-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.operator.replicas }}
+  selector:
+    matchLabels:
+      app: forklift
+      control-plane: forklift-operator
+  template:
+    metadata:
+      labels:
+        app: forklift
+        control-plane: forklift-operator
+    spec:
+      serviceAccountName: forklift-operator
+      containers:
+        - name: forklift-operator
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.image.repository "tag" .Values.version "global" .Values.global) }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: forklift-operator
+            - name: OPERATOR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONTROLLER_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/forklift-controller" "tag" .Values.version "global" .Values.global) }}
+            - name: API_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/forklift-api" "tag" .Values.version "global" .Values.global) }}
+            - name: VALIDATION_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/forklift-validation" "tag" .Values.version "global" .Values.global) }}
+            - name: VIRT_V2V_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/forklift-virt-v2v" "tag" .Values.version "global" .Values.global) }}
+            - name: MUST_GATHER_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/forklift-must-gather" "tag" .Values.version "global" .Values.global) }}
+            - name: UI_PLUGIN_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/forklift-console-plugin" "tag" .Values.version "global" .Values.global) }}
+            - name: POPULATOR_CONTROLLER_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/populator-controller" "tag" .Values.version "global" .Values.global) }}
+            - name: OVIRT_POPULATOR_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/ovirt-populator" "tag" .Values.version "global" .Values.global) }}
+            - name: OPENSTACK_POPULATOR_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/openstack-populator" "tag" .Values.version "global" .Values.global) }}
+            - name: OVA_PROVIDER_SERVER_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/forklift-ova-provider-server" "tag" .Values.version "global" .Values.global) }}
+            - name: OVA_PROXY_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/forklift-ova-proxy" "tag" .Values.version "global" .Values.global) }}
+            - name: VIRT_V2V_IMAGE_XFS
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubev2v/forklift-virt-v2v" "tag" .Values.version "global" .Values.global) }}
+            - name: ANSIBLE_GATHERING
+              value: explicit
+          ports:
+            - containerPort: 8443
+              name: metrics
+              protocol: TCP
+          {{- with .Values.operator.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+      nodeSelector:
+        {{- include "kubevirt-stack.nodeSelector" (dict "global" .Values.global.nodeSelector "local" .Values.operator.nodeSelector) | nindent 8 }}
+      {{- $tolerations := include "kubevirt-stack.tolerations" (dict "global" .Values.global.tolerations "local" .Values.operator.tolerations) -}}
+      {{- if $tolerations }}
+      tolerations:
+        {{- $tolerations | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true

@@ -1,0 +1,46 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+namespace: konveyor-forklift
+version: release-2.12
+
+operator:
+  image:
+    repository: quay.io/kubev2v/forklift-operator
+  replicas: 1
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+
+## Trusted CA bundle for Forklift Provider connections.
+## If your source clusters use certificates signed by a corporate CA,
+## provide the PEM-encoded CA bundle here. A ConfigMap will be created
+## that you can reference when creating Provider secrets.
+##
+## Example:
+##   trustedCA: |
+##     -----BEGIN CERTIFICATE-----
+##     MIIBxTCCAWugAwIBAgI...
+##     -----END CERTIFICATE-----
+trustedCA: ""
+
+## Inventory proxy — exposes the forklift-inventory API via the k8s API
+## service proxy. Required on vanilla Kubernetes where kubeconfigs use
+## client certificates (RKE2, kubeadm) instead of bearer tokens.
+## The proxy injects a forklift-controller SA token so that
+## forklift-inventory accepts the request.
+## Without this, tools like Headlamp cannot access the inventory API.
+inventoryProxy:
+  enabled: true
+  image:
+    repository: openresty/openresty
+    tag: 1.31.1.1-1-alpine-fat
+  resources:
+    requests:
+      cpu: 5m
+      memory: 16Mi
+    limits:
+      memory: 64Mi

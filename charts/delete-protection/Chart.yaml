@@ -1,0 +1,7 @@
+apiVersion: v2
+name: kubevirt-delete-protection
+description: ValidatingAdmissionPolicy to protect KubeVirt VMs from accidental deletion
+type: application
+version: 1.8.1
+appVersion: "1.8.1"
+kubeVersion: ">=1.30.0-0"

@@ -1,0 +1,22 @@
+{{- if not .Values.rke2.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: multus-daemon-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: multus
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+data:
+  daemon-config.json: |
+    {
+      "chrootDir": "/hostroot",
+      "cniVersion": "{{ .Values.cniVersion }}",
+      "logLevel": "verbose",
+      "logToStderr": true,
+      "cniConfigDir": "/host/etc/cni/net.d",
+      "multusConfigFile": "auto",
+      "multusAutoconfigDir": "/host/etc/cni/net.d",
+      "socketDir": "/host/run/multus/"
+    }
+{{- end }}

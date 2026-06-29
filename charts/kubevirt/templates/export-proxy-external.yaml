@@ -1,0 +1,73 @@
+{{- if .Values.exportProxy.externalMode.enabled }}
+{{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1") }}
+{{- fail "cert-manager.io/v1 CRDs not found. Install cert-manager before enabling exportProxy.externalMode." }}
+{{- end }}
+{{- if not .Values.exportProxy.externalMode.hostname }}
+{{- fail "exportProxy.externalMode.hostname is required when exportProxy.externalMode.enabled is true" }}
+{{- end }}
+{{- if not .Values.exportProxy.externalMode.ingressClassName }}
+{{- fail "exportProxy.externalMode.ingressClassName is required when exportProxy.externalMode.enabled is true" }}
+{{- end }}
+{{- /* Self-signed Issuer if no issuerRef provided */ -}}
+{{- if not .Values.exportProxy.externalMode.certManager.issuerRef }}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: virt-exportproxy-selfsigned
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+{{- end }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: virt-exportproxy-external
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  secretName: virt-exportproxy-external-tls
+  {{- if .Values.exportProxy.externalMode.certManager.issuerRef }}
+  issuerRef:
+    {{- toYaml .Values.exportProxy.externalMode.certManager.issuerRef | nindent 4 }}
+  {{- else }}
+  issuerRef:
+    name: virt-exportproxy-selfsigned
+    kind: Issuer
+  {{- end }}
+  dnsNames:
+    - {{ .Values.exportProxy.externalMode.hostname }}
+  duration: 8760h
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: virt-exportproxy
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+spec:
+  ingressClassName: {{ .Values.exportProxy.externalMode.ingressClassName }}
+  rules:
+    - host: {{ .Values.exportProxy.externalMode.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: virt-exportproxy
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - {{ .Values.exportProxy.externalMode.hostname }}
+      secretName: virt-exportproxy-external-tls
+{{- end }}

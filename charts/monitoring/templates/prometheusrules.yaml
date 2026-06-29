@@ -1,0 +1,81 @@
+{{- if and .Values.monitoring.enabled .Values.monitoring.prometheusRules.enabled }}
+{{- $ns := .Values.monitoring.prometheusRules.namespace | default .Values.kubevirt.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kubevirt-rules
+  namespace: {{ $ns }}
+  labels:
+    app: kubevirt
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+    {{- with .Values.monitoring.prometheusRules.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    - name: kubevirt.rules
+      rules:
+        - alert: VirtOperatorDown
+          expr: kubevirt_virt_operator_up == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "KubeVirt virt-operator is down"
+            description: "No virt-operator pod has been running for more than 10 minutes."
+
+        - alert: VirtAPIDown
+          expr: kubevirt_virt_api_up == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "KubeVirt virt-api is down"
+            description: "No virt-api pod has been running for more than 10 minutes."
+
+        - alert: VirtControllerDown
+          expr: kubevirt_virt_controller_up == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "KubeVirt virt-controller is down"
+            description: "No virt-controller pod has been running for more than 10 minutes."
+
+        - alert: VirtHandlerDown
+          expr: kubevirt_virt_handler_up == 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "KubeVirt virt-handler is down on a node"
+            description: "A virt-handler pod has not been running for more than 10 minutes on at least one node."
+
+        - alert: VMIHighMemoryUsage
+          expr: kubevirt_vmi_memory_used_bytes / kubevirt_vmi_memory_available_bytes > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "VM {{ "{{" }} $labels.name {{ "}}" }} memory usage above 90%"
+            description: "VM {{ "{{" }} $labels.name {{ "}}" }} in namespace {{ "{{" }} $labels.namespace {{ "}}" }} is using more than 90% of available memory."
+
+        - alert: VMIMigrationFailed
+          expr: increase(kubevirt_vmi_migration_failed_total[1h]) > 0
+          labels:
+            severity: warning
+          annotations:
+            summary: "VM migration failures detected"
+            description: "There have been VM migration failures in the last hour."
+
+    - name: kubevirt-vmi.rules
+      rules:
+        - record: kubevirt:vmi_running:count
+          expr: count(kubevirt_vmi_phase_count{phase="Running"}) or vector(0)
+
+        - record: kubevirt:vmi_pending:count
+          expr: count(kubevirt_vmi_phase_count{phase="Pending"}) or vector(0)
+
+        - record: kubevirt:vmi_migrations_in_progress:count
+          expr: count(kubevirt_vmi_migration_phase{phase="Running"}) or vector(0)
+{{- end }}

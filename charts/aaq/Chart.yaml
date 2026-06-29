@@ -1,0 +1,9 @@
+apiVersion: v2
+name: aaq
+description: Application Aware Quota — quota management for KubeVirt workloads
+type: application
+version: 1.7.0
+appVersion: "1.7.0"
+kubeVersion: ">=1.30.0-0"
+sources:
+  - https://github.com/kubevirt/applications-aware-quota

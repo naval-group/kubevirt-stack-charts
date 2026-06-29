@@ -1,0 +1,19 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+namespace: hostpath-provisioner
+version: v0.25.0
+
+## WARNING: Use a dedicated partition, NOT a directory on the OS disk!
+## Requires cert-manager to be installed in the cluster.
+storagePath: /var/hpvolumes
+storagePools: []
+
+operator:
+  image:
+    repository: quay.io/kubevirt/hostpath-provisioner-operator
+  nodeSelector: {}
+  tolerations: []

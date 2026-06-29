@@ -1,0 +1,12 @@
+{{- $ns := include "kubevirt-stack.namespace" . -}}
+{{- if ne $ns .Release.Namespace }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $ns }}
+  labels:
+    kubevirt.io: ""
+    pod-security.kubernetes.io/enforce: privileged
+    mutatepods.kubemacpool.io: ignore
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+{{- end }}

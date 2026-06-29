@@ -1,0 +1,44 @@
+{{- if .Values.deleteProtection.enabled }}
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: kubevirt-vm-delete-protection
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - kubevirt.io
+        apiVersions:
+          - v1
+        operations:
+          - DELETE
+        resources:
+          - virtualmachines
+  matchConditions:
+    - name: has-protection-label
+      expression: >-
+        has(oldObject.metadata.labels) &&
+        {{ .Values.deleteProtection.labelKey | quote }} in oldObject.metadata.labels &&
+        oldObject.metadata.labels[{{ .Values.deleteProtection.labelKey | quote }}] == {{ .Values.deleteProtection.labelValue | quote }}
+  validations:
+    - expression: "false"
+      message: >-
+        This VirtualMachine is protected from deletion.
+        Remove the label '{{ .Values.deleteProtection.labelKey }}' to allow deletion.
+      reason: Forbidden
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: kubevirt-vm-delete-protection
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  policyName: kubevirt-vm-delete-protection
+  validationActions:
+    - Deny
+{{- end }}

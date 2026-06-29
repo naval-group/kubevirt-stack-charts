@@ -1,0 +1,62 @@
+{{- if not (.Capabilities.APIVersions.Has "monitoring.coreos.com/v1") }}
+{{- fail "monitoring.coreos.com/v1 CRDs not found. Install kube-prometheus-stack before installing the monitoring chart." }}
+{{- end }}
+{{- if and .Values.monitoring.enabled .Values.monitoring.serviceMonitor.enabled }}
+{{- $ns := .Values.monitoring.serviceMonitor.namespace | default .Values.kubevirt.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kubevirt-prometheus-metrics
+  namespace: {{ $ns }}
+  labels:
+    app: kubevirt
+    prometheus.kubevirt.io: "true"
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+    {{- with .Values.monitoring.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.kubevirt.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+  selector:
+    matchLabels:
+      prometheus.kubevirt.io: "true"
+  endpoints:
+    - port: metrics
+      scheme: HTTPS
+      tlsConfig:
+        insecureSkipVerify: true
+      interval: {{ .Values.monitoring.serviceMonitor.interval }}
+      honorLabels: true
+{{- if .Values.cdi.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cdi-prometheus-metrics
+  namespace: {{ $ns }}
+  labels:
+    app: cdi
+    prometheus.cdi.kubevirt.io: "true"
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+    {{- with .Values.monitoring.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.cdi.namespace }}
+  selector:
+    matchLabels:
+      prometheus.cdi.kubevirt.io: "true"
+  endpoints:
+    - port: metrics
+      scheme: HTTPS
+      tlsConfig:
+        insecureSkipVerify: true
+      interval: {{ .Values.monitoring.serviceMonitor.interval }}
+      honorLabels: true
+{{- end }}
+{{- end }}

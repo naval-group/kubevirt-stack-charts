@@ -1,0 +1,18 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+namespace: kubemacpool-system
+
+image:
+  repository: quay.io/kubevirt/kubemacpool
+  tag: v0.45.0
+
+rangeStart: "02:00:00:00:00:00"
+rangeEnd: "02:FF:FF:FF:FF:FF"
+replicas: 1
+resources: {}
+nodeSelector: {}
+tolerations: []

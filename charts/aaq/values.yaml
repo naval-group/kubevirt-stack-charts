@@ -1,0 +1,25 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+namespace: aaq
+version: v1.7.0
+
+operator:
+  image:
+    repository: quay.io/kubevirt/aaq-operator
+  replicas: 1
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+
+cr:
+  imagePullPolicy: IfNotPresent
+  infra:
+    nodeSelector:
+      kubernetes.io/os: linux
+  workload:
+    nodeSelector:
+      kubernetes.io/os: linux

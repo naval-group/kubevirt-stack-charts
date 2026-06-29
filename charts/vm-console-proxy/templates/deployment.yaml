@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vm-console-proxy
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    app: vm-console-proxy
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: vm-console-proxy
+  template:
+    metadata:
+      labels:
+        app: vm-console-proxy
+    spec:
+      serviceAccountName: vm-console-proxy
+      containers:
+        - name: console-proxy
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.image.repository "tag" .Values.image.tag "global" .Values.global) }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8768
+              name: api
+              protocol: TCP
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+      nodeSelector:
+        {{- include "kubevirt-stack.nodeSelector" (dict "global" .Values.global.nodeSelector "local" .Values.nodeSelector) | nindent 8 }}
+      {{- $tolerations := include "kubevirt-stack.tolerations" (dict "global" .Values.global.tolerations "local" .Values.tolerations) -}}
+      {{- if $tolerations }}
+      tolerations:
+        {{- $tolerations | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: vm-console-proxy-config

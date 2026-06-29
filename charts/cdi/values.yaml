@@ -1,0 +1,54 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+namespace: cdi
+version: v1.65.0
+
+operator:
+  replicas: 1
+  image:
+    repository: quay.io/kubevirt/cdi-operator
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+
+## Expose CDI upload proxy externally for virtctl image-upload.
+## Without this, virtctl needs --uploadproxy-url with a port-forward.
+##
+## Requirements:
+##   - An Ingress controller with backend HTTPS support (e.g. ingress-nginx)
+##   - cert-manager (for automatic TLS cert generation)
+uploadProxy:
+  externalMode:
+    enabled: false
+    ## FQDN for the upload proxy (must be resolvable from clients)
+    hostname: ""
+    ## Ingress class name (e.g. nginx)
+    ingressClassName: ""
+    ## cert-manager issuer reference. If empty, a self-signed Issuer is created.
+    certManager:
+      issuerRef: {}
+
+cr:
+  config:
+    featureGates: []
+    ## Resource requirements for CDI importer/cloner pods
+    ## Example:
+    ##   podResourceRequirements:
+    ##     limits:
+    ##       cpu: "4"
+    ##       memory: 4Gi
+    ##     requests:
+    ##       cpu: "1"
+    ##       memory: 512Mi
+    podResourceRequirements: {}
+  imagePullPolicy: IfNotPresent
+  infra:
+    nodeSelector:
+      kubernetes.io/os: linux
+  workload:
+    nodeSelector:
+      kubernetes.io/os: linux

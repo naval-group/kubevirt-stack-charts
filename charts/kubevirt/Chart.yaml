@@ -1,0 +1,10 @@
+apiVersion: v2
+name: kubevirt
+description: KubeVirt operator and CR — core VM lifecycle management
+type: application
+version: 1.8.1
+appVersion: "1.8.1"
+kubeVersion: ">=1.30.0-0"
+home: https://kubevirt.io
+sources:
+  - https://github.com/kubevirt/kubevirt

@@ -1,0 +1,28 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: butane-operator-validating-webhook-configuration
+  labels:
+    app: butane-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+webhooks:
+  - name: vbutaneconfig.kb.io
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: butane-operator-webhook-service
+        namespace: {{ .Values.namespace }}
+        path: /validate-butane-operators-naval-group-com-v1alpha1-butaneconfig
+    failurePolicy: Fail
+    rules:
+      - apiGroups:
+          - butane.operators.naval-group.com
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - butaneconfigs
+    sideEffects: None

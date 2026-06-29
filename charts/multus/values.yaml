@@ -1,0 +1,43 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+## RKE2 mode — if your cluster is RKE2, Multus is already installed.
+## This deploys a HelmChartConfig to configure it (thick plugin + DNC).
+## When enabled, all standalone Multus resources are skipped.
+rke2:
+  enabled: false
+  ## CRI socket path (RKE2 uses /run/k3s/containerd/containerd.sock)
+  criSocket: /run/k3s/containerd/containerd.sock
+  multusSocket: /run/multus/multus.sock
+
+## Standalone Multus deployment (ignored when rke2.enabled=true)
+namespace: kube-system
+thick: true
+cniVersion: "0.3.1"
+
+image:
+  repository: ghcr.io/k8snetworkplumbingwg/multus-cni
+  tag: v4.1.4
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 50Mi
+
+tolerations:
+  - operator: Exists
+
+dynamicNetworks:
+  enabled: true
+  image:
+    repository: ghcr.io/k8snetworkplumbingwg/multus-dynamic-networks-controller
+    tag: v0.3.7
+  criSocket: /run/containerd/containerd.sock
+  multusSocket: /run/multus/multus.sock
+  resources:
+    requests:
+      cpu: 100m
+      memory: 50Mi

@@ -1,0 +1,22 @@
+{{- if .Values.rke2.enabled }}
+## Configures the RKE2-managed Multus deployment via HelmChartConfig.
+## This enables thick plugin mode and the dynamic networks controller,
+## which are required for KubeVirt hot-plug network interfaces.
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-multus
+  namespace: kube-system
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  failurePolicy: reinstall
+  valuesContent: |-
+    thickPlugin:
+      enabled: true
+    dynamicNetworksController:
+      enabled: true
+      sockets:
+        containerd: {{ .Values.rke2.criSocket }}
+        multus: {{ .Values.rke2.multusSocket }}
+{{- end }}

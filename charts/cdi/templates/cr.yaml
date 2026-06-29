@@ -1,0 +1,29 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: CDI
+metadata:
+  name: cdi
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  config:
+    {{- with .Values.cr.config.featureGates }}
+    featureGates:
+      {{- toYaml . | nindent 6 }}
+    {{- else }}
+    featureGates:
+      - HonorWaitForFirstConsumer
+      - WebhookPvcRendering
+    {{- end }}
+    {{- with .Values.cr.config.podResourceRequirements }}
+    podResourceRequirements:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  imagePullPolicy: {{ .Values.cr.imagePullPolicy }}
+  {{- with .Values.cr.infra }}
+  infra:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.cr.workload }}
+  workload:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

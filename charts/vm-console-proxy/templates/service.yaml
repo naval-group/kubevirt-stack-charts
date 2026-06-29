@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vm-console-proxy
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    app: vm-console-proxy
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 8768
+      targetPort: api
+      protocol: TCP
+      name: api
+  selector:
+    app: vm-console-proxy

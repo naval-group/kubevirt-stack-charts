@@ -1,0 +1,17 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+## Defaults to global.kubevirtNamespace
+namespace: ""
+
+image:
+  repository: quay.io/kubevirt/vm-console-proxy
+  tag: v0.8.0
+
+replicas: 1
+resources: {}
+nodeSelector: {}
+tolerations: []

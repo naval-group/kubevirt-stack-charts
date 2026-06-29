@@ -1,0 +1,13 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: hostpath-csi
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  annotations:
+    description: KubeVirt hostpath CSI provisioner
+provisioner: kubevirt.io.hostpath-provisioner
+parameters:
+  storagePool: local
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer

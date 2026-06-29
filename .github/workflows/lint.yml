@@ -1,0 +1,44 @@
+name: Lint & Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Helm Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v4.2.0
+
+      - name: Lint all charts
+        run: |
+          for chart in charts/*/; do
+            echo "=== Linting $(basename $chart) ==="
+            helm lint "$chart" || exit 1
+          done
+
+      - name: Template all charts (standalone)
+        run: |
+          for chart in charts/*/; do
+            name=$(basename "$chart")
+            echo "=== Templating $name ==="
+            helm template test "$chart" \
+              --api-versions cert-manager.io/v1 \
+              --api-versions monitoring.coreos.com/v1 \
+              > /dev/null || exit 1
+          done
+
+      - name: Validate schemas
+        run: |
+          for schema in charts/*/values.schema.json; do
+            echo "=== Validating $(dirname $schema | xargs basename) schema ==="
+            python3 -c "import json; json.load(open('$schema')); print('  Valid JSON')"
+          done

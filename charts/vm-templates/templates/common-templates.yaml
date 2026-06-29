@@ -1,0 +1,371 @@
+{{- if .Values.vmTemplates.enabled }}
+---
+apiVersion: template.kubevirt.io/v1alpha1
+kind: VirtualMachineTemplate
+metadata:
+  name: fedora-server
+  namespace: {{ .Values.vmTemplates.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+  labels:
+    os.template.kubevirt.io/fedora: "true"
+    workload.template.kubevirt.io/server: "true"
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  annotations:
+    description: "Fedora Server VM template"
+    iconClass: icon-fedora
+spec:
+  parameters:
+    - name: NAME
+      description: "Name of the VirtualMachine"
+      required: true
+    - name: DISK_SIZE
+      description: "Size of the root disk"
+      value: "30Gi"
+    - name: CPU_CORES
+      description: "Number of CPU cores"
+      value: "2"
+    - name: MEMORY
+      description: "Amount of memory"
+      value: "4Gi"
+  objects:
+    - apiVersion: kubevirt.io/v1
+      kind: VirtualMachine
+      metadata:
+        name: ${NAME}
+        labels:
+          app: ${NAME}
+          kubevirt.io/os: linux
+      spec:
+        running: false
+        template:
+          metadata:
+            labels:
+              kubevirt.io/domain: ${NAME}
+          spec:
+            domain:
+              cpu:
+                cores: {{ `"${{CPU_CORES}}"` }}
+              memory:
+                guest: ${MEMORY}
+              devices:
+                disks:
+                  - name: rootdisk
+                    disk:
+                      bus: virtio
+                  - name: cloudinitdisk
+                    disk:
+                      bus: virtio
+                interfaces:
+                  - name: default
+                    masquerade: {}
+                rng: {}
+              features:
+                acpi: {}
+            networks:
+              - name: default
+                pod: {}
+            volumes:
+              - name: rootdisk
+                dataVolume:
+                  name: ${NAME}-rootdisk
+              - name: cloudinitdisk
+                cloudInitNoCloud:
+                  userData: |
+                    #cloud-config
+                    hostname: ${NAME}
+        dataVolumeTemplates:
+          - metadata:
+              name: ${NAME}-rootdisk
+            spec:
+              storage:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: ${DISK_SIZE}
+              source:
+                registry:
+                  url: docker://quay.io/containerdisks/fedora:latest
+---
+apiVersion: template.kubevirt.io/v1alpha1
+kind: VirtualMachineTemplate
+metadata:
+  name: ubuntu-server
+  namespace: {{ .Values.vmTemplates.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+  labels:
+    os.template.kubevirt.io/ubuntu: "true"
+    workload.template.kubevirt.io/server: "true"
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  annotations:
+    description: "Ubuntu Server VM template"
+    iconClass: icon-ubuntu
+spec:
+  parameters:
+    - name: NAME
+      description: "Name of the VirtualMachine"
+      required: true
+    - name: DISK_SIZE
+      description: "Size of the root disk"
+      value: "30Gi"
+    - name: CPU_CORES
+      description: "Number of CPU cores"
+      value: "2"
+    - name: MEMORY
+      description: "Amount of memory"
+      value: "4Gi"
+  objects:
+    - apiVersion: kubevirt.io/v1
+      kind: VirtualMachine
+      metadata:
+        name: ${NAME}
+        labels:
+          app: ${NAME}
+          kubevirt.io/os: linux
+      spec:
+        running: false
+        template:
+          metadata:
+            labels:
+              kubevirt.io/domain: ${NAME}
+          spec:
+            domain:
+              cpu:
+                cores: {{ `"${{CPU_CORES}}"` }}
+              memory:
+                guest: ${MEMORY}
+              devices:
+                disks:
+                  - name: rootdisk
+                    disk:
+                      bus: virtio
+                  - name: cloudinitdisk
+                    disk:
+                      bus: virtio
+                interfaces:
+                  - name: default
+                    masquerade: {}
+                rng: {}
+              features:
+                acpi: {}
+            networks:
+              - name: default
+                pod: {}
+            volumes:
+              - name: rootdisk
+                dataVolume:
+                  name: ${NAME}-rootdisk
+              - name: cloudinitdisk
+                cloudInitNoCloud:
+                  userData: |
+                    #cloud-config
+                    hostname: ${NAME}
+        dataVolumeTemplates:
+          - metadata:
+              name: ${NAME}-rootdisk
+            spec:
+              storage:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: ${DISK_SIZE}
+              source:
+                registry:
+                  url: docker://quay.io/containerdisks/ubuntu:latest
+---
+apiVersion: template.kubevirt.io/v1alpha1
+kind: VirtualMachineTemplate
+metadata:
+  name: centos-server
+  namespace: {{ .Values.vmTemplates.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+  labels:
+    os.template.kubevirt.io/centos: "true"
+    workload.template.kubevirt.io/server: "true"
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  annotations:
+    description: "CentOS Stream Server VM template"
+    iconClass: icon-centos
+spec:
+  parameters:
+    - name: NAME
+      description: "Name of the VirtualMachine"
+      required: true
+    - name: DISK_SIZE
+      description: "Size of the root disk"
+      value: "30Gi"
+    - name: CPU_CORES
+      description: "Number of CPU cores"
+      value: "2"
+    - name: MEMORY
+      description: "Amount of memory"
+      value: "4Gi"
+  objects:
+    - apiVersion: kubevirt.io/v1
+      kind: VirtualMachine
+      metadata:
+        name: ${NAME}
+        labels:
+          app: ${NAME}
+          kubevirt.io/os: linux
+      spec:
+        running: false
+        template:
+          metadata:
+            labels:
+              kubevirt.io/domain: ${NAME}
+          spec:
+            domain:
+              cpu:
+                cores: {{ `"${{CPU_CORES}}"` }}
+              memory:
+                guest: ${MEMORY}
+              devices:
+                disks:
+                  - name: rootdisk
+                    disk:
+                      bus: virtio
+                  - name: cloudinitdisk
+                    disk:
+                      bus: virtio
+                interfaces:
+                  - name: default
+                    masquerade: {}
+                rng: {}
+              features:
+                acpi: {}
+            networks:
+              - name: default
+                pod: {}
+            volumes:
+              - name: rootdisk
+                dataVolume:
+                  name: ${NAME}-rootdisk
+              - name: cloudinitdisk
+                cloudInitNoCloud:
+                  userData: |
+                    #cloud-config
+                    hostname: ${NAME}
+        dataVolumeTemplates:
+          - metadata:
+              name: ${NAME}-rootdisk
+            spec:
+              storage:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: ${DISK_SIZE}
+              source:
+                registry:
+                  url: docker://quay.io/containerdisks/centos-stream:9
+---
+apiVersion: template.kubevirt.io/v1alpha1
+kind: VirtualMachineTemplate
+metadata:
+  name: windows-desktop
+  namespace: {{ .Values.vmTemplates.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+  labels:
+    os.template.kubevirt.io/windows: "true"
+    workload.template.kubevirt.io/desktop: "true"
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  annotations:
+    description: "Windows Desktop VM template (bring your own ISO)"
+    iconClass: icon-windows
+spec:
+  parameters:
+    - name: NAME
+      description: "Name of the VirtualMachine"
+      required: true
+    - name: DISK_SIZE
+      description: "Size of the root disk"
+      value: "60Gi"
+    - name: CPU_CORES
+      description: "Number of CPU cores"
+      value: "4"
+    - name: MEMORY
+      description: "Amount of memory"
+      value: "8Gi"
+    - name: ISO_PVC
+      description: "Name of PVC containing Windows ISO"
+      required: true
+  objects:
+    - apiVersion: kubevirt.io/v1
+      kind: VirtualMachine
+      metadata:
+        name: ${NAME}
+        labels:
+          app: ${NAME}
+          kubevirt.io/os: windows
+      spec:
+        running: false
+        template:
+          metadata:
+            labels:
+              kubevirt.io/domain: ${NAME}
+          spec:
+            domain:
+              cpu:
+                cores: {{ `"${{CPU_CORES}}"` }}
+              memory:
+                guest: ${MEMORY}
+              clock:
+                utc: {}
+                timer:
+                  hpet:
+                    present: false
+                  pit:
+                    tickPolicy: delay
+                  rtc:
+                    tickPolicy: catchup
+                  hyperv: {}
+              devices:
+                disks:
+                  - name: rootdisk
+                    disk:
+                      bus: sata
+                  - name: iso
+                    cdrom:
+                      bus: sata
+                  - name: virtiocontainerdisk
+                    cdrom:
+                      bus: sata
+                interfaces:
+                  - name: default
+                    masquerade: {}
+                tpm: {}
+                inputs:
+                  - type: tablet
+                    bus: usb
+                    name: tablet
+              features:
+                acpi: {}
+                hyperv:
+                  relaxed: {}
+                  vapic: {}
+                  spinlocks:
+                    spinlocks: 8191
+            networks:
+              - name: default
+                pod: {}
+            volumes:
+              - name: rootdisk
+                dataVolume:
+                  name: ${NAME}-rootdisk
+              - name: iso
+                persistentVolumeClaim:
+                  claimName: ${ISO_PVC}
+              - name: virtiocontainerdisk
+                containerDisk:
+                  image: quay.io/kubevirt/virtio-container-disk:latest
+        dataVolumeTemplates:
+          - metadata:
+              name: ${NAME}-rootdisk
+            spec:
+              storage:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: ${DISK_SIZE}
+              source:
+                blank: {}
+{{- end }}

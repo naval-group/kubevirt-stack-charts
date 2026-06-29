@@ -1,0 +1,15 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+namespace: kube-system
+
+image:
+  repository: quay.io/kubevirt/kubevirt-cloud-controller-manager
+  tag: v0.6.0
+
+resources: {}
+nodeSelector: {}
+tolerations: []

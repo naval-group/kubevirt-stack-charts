@@ -1,0 +1,168 @@
+{{- if .Values.inventoryProxy.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forklift-inventory-proxy-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: forklift-inventory-proxy
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+data:
+  nginx.conf: |
+    worker_processes 1;
+    error_log /dev/stderr info;
+
+    events {
+      worker_connections 64;
+    }
+
+    http {
+      access_log /dev/stdout;
+
+      server {
+        listen 8080;
+
+        location /healthz {
+          return 200 'ok';
+          add_header Content-Type text/plain;
+        }
+
+        location / {
+          access_by_lua_block {
+            -- If the request has a bearer token (OIDC/SA token users),
+            -- forward it as-is so forklift-inventory does per-user RBAC.
+            local auth = ngx.req.get_headers()["authorization"]
+            if auth and auth:match("^Bearer ") then
+              return
+            end
+
+            -- No bearer token (client-cert auth via k8s API proxy).
+            -- The k8s API already checked services/proxy RBAC via the
+            -- forklift-inventory-proxy-access Role.
+            -- Inject the forklift-controller SA token as fallback.
+            local f = io.open("/var/run/secrets/forklift/token", "r")
+            if f then
+              local token = f:read("*a"):gsub("%s+$", "")
+              f:close()
+              ngx.req.set_header("Authorization", "Bearer " .. token)
+            else
+              ngx.log(ngx.ERR, "Failed to read SA token")
+              ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+            end
+          }
+
+          proxy_pass https://forklift-inventory.{{ .Values.namespace }}.svc.cluster.local:8443;
+          proxy_ssl_verify off;
+          proxy_set_header Host $host;
+          proxy_http_version 1.1;
+        }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forklift-inventory-proxy
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: forklift-inventory-proxy
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forklift-inventory-proxy
+  template:
+    metadata:
+      labels:
+        app: forklift-inventory-proxy
+    spec:
+      serviceAccountName: forklift-controller
+      containers:
+        - name: openresty
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.inventoryProxy.image.repository "tag" .Values.inventoryProxy.image.tag "global" .Values.global) }}
+          command:
+            - /usr/local/openresty/bin/openresty
+            - -g
+            - "daemon off;"
+            - -c
+            - /etc/proxy/nginx.conf
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          {{- with .Values.inventoryProxy.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: proxy-config
+              mountPath: /etc/proxy
+              readOnly: true
+            - name: sa-token
+              mountPath: /var/run/secrets/forklift
+              readOnly: true
+            - name: tmp
+              mountPath: /usr/local/openresty/nginx/client_body_temp
+            - name: tmp-proxy
+              mountPath: /usr/local/openresty/nginx/proxy_temp
+            - name: tmp-fastcgi
+              mountPath: /usr/local/openresty/nginx/fastcgi_temp
+      volumes:
+        - name: proxy-config
+          configMap:
+            name: forklift-inventory-proxy-config
+        - name: sa-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: token
+                  expirationSeconds: 3600
+        - name: tmp
+          emptyDir: {}
+        - name: tmp-proxy
+          emptyDir: {}
+        - name: tmp-fastcgi
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forklift-inventory-proxy
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: forklift-inventory-proxy
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: forklift-inventory-proxy
+---
+## Role controlling who can access the inventory proxy.
+## Users must have this role (via RoleBinding) to reach the proxy
+## through the k8s API service proxy. This is the security gate for
+## client-cert kubeconfigs where kube-rbac-proxy cannot validate tokens.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: forklift-inventory-proxy-access
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: forklift-inventory-proxy
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["services/proxy"]
+    resourceNames: ["forklift-inventory-proxy", "forklift-inventory-proxy:8080", "forklift-inventory-proxy:http"]
+    verbs: ["get", "create"]
+{{- end }}

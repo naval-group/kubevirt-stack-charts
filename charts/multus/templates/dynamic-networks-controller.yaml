@@ -1,0 +1,149 @@
+{{- if and (not .Values.rke2.enabled) .Values.dynamicNetworks.enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dynamic-networks-controller
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: dynamic-networks-controller
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dynamic-networks-controller
+  labels:
+    app: dynamic-networks-controller
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - k8s.cni.cncf.io
+    resources:
+      - network-attachment-definitions
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/status
+    verbs:
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - ""
+      - events.k8s.io
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dynamic-networks-controller
+  labels:
+    app: dynamic-networks-controller
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dynamic-networks-controller
+subjects:
+  - kind: ServiceAccount
+    name: dynamic-networks-controller
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dynamic-networks-controller-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: dynamic-networks-controller
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+data:
+  dynamic-networks-config.json: |
+    {
+      "criSocketPath": "{{ .Values.dynamicNetworks.criSocket }}",
+      "multusSocketPath": "{{ .Values.dynamicNetworks.multusSocket }}"
+    }
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dynamic-networks-controller
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: dynamic-networks-controller
+    tier: node
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: dynamic-networks-controller
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: dynamic-networks-controller
+        tier: node
+    spec:
+      serviceAccountName: dynamic-networks-controller
+      hostNetwork: true
+      containers:
+        - name: dynamic-networks-controller
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.dynamicNetworks.image.repository "tag" .Values.dynamicNetworks.image.tag "global" .Values.global) }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /dynamic-networks-controller
+          args:
+            - -config
+            - /etc/dynamic-networks-controller/dynamic-networks-config.json
+            - -v=5
+          {{- with .Values.dynamicNetworks.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/healthy
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: dynamic-networks-controller-config
+              mountPath: /etc/dynamic-networks-controller
+              readOnly: true
+            - name: multus-server-socket
+              mountPath: /run/multus/multus.sock
+            - name: cri-socket
+              mountPath: {{ .Values.dynamicNetworks.criSocket }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      volumes:
+        - name: dynamic-networks-controller-config
+          configMap:
+            name: dynamic-networks-controller-config
+        - name: multus-server-socket
+          hostPath:
+            path: {{ .Values.dynamicNetworks.multusSocket }}
+            type: Socket
+        - name: cri-socket
+          hostPath:
+            path: {{ .Values.dynamicNetworks.criSocket }}
+            type: Socket
+{{- end }}

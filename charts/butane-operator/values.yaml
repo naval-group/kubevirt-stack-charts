@@ -1,0 +1,28 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+namespace: butane-operator-system
+replicas: 1
+
+image:
+  repository: ghcr.io/naval-group/butane-operator
+  tag: v0.1.1-rc2
+
+rbacProxy:
+  image:
+    repository: registry.k8s.io/kubebuilder/kube-rbac-proxy
+    tag: v0.16.0
+
+resources:
+  limits:
+    cpu: 800m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+tolerations: []

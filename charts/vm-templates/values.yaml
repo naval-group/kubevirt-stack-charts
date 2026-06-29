@@ -1,0 +1,10 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+vmTemplates:
+  enabled: true
+  ## Defaults to global.kubevirtNamespace
+  namespace: ""

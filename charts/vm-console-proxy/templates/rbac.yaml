@@ -1,0 +1,99 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vm-console-proxy
+  labels:
+    app: vm-console-proxy
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - kubevirt.io
+    resources:
+      - virtualmachines
+      - virtualmachineinstances
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - subresources.kubevirt.io
+    resources:
+      - virtualmachineinstances/vnc
+      - virtualmachineinstances/console
+    verbs:
+      - get
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
+  - apiGroups:
+      - authorization.k8s.io
+    resources:
+      - subjectaccessreviews
+    verbs:
+      - create
+---
+## Needed for API server authentication config discovery
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vm-console-proxy-auth-reader
+  namespace: kube-system
+  labels:
+    app: vm-console-proxy
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    resourceNames:
+      - extension-apiserver-authentication
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vm-console-proxy-auth-reader
+  namespace: kube-system
+  labels:
+    app: vm-console-proxy
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vm-console-proxy-auth-reader
+subjects:
+  - kind: ServiceAccount
+    name: vm-console-proxy
+    namespace: {{ include "kubevirt-stack.namespace" . }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vm-console-proxy
+  labels:
+    app: vm-console-proxy
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vm-console-proxy
+subjects:
+  - kind: ServiceAccount
+    name: vm-console-proxy
+    namespace: {{ include "kubevirt-stack.namespace" . }}

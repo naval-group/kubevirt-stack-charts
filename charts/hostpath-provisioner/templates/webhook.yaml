@@ -1,0 +1,81 @@
+{{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1") }}
+{{- fail (printf "cert-manager.io/v1 CRDs not found. Install cert-manager before installing %s." .Chart.Name) }}
+{{- end }}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: hostpath-provisioner
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hostpath-provisioner-operator-webhook-service-cert
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: hostpath-provisioner
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  secretName: hostpath-provisioner-operator-webhook-service-cert
+  dnsNames:
+    - hostpath-provisioner-operator-webhook-service.{{ .Values.namespace }}.svc
+  issuerRef:
+    name: selfsigned-issuer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hostpath-provisioner-operator-webhook-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: hostpath-provisioner
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 9443
+  selector:
+    name: hostpath-provisioner-operator
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: hostpathprovisioner.kubevirt.io
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Values.namespace }}/hostpath-provisioner-operator-webhook-service-cert
+  labels:
+    app: hostpath-provisioner
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+webhooks:
+  - name: validate-hostpath-provisioner.kubevirt.io
+    admissionReviewVersions:
+      - v1beta1
+    clientConfig:
+      service:
+        name: hostpath-provisioner-operator-webhook-service
+        namespace: {{ .Values.namespace }}
+        path: /validate-hostpathprovisioner-kubevirt-io-v1beta1-hostpathprovisioner
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    rules:
+      - apiGroups:
+          - hostpathprovisioner.kubevirt.io
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - DELETE
+          - UPDATE
+        resources:
+          - "*/*"
+        scope: "*"
+    sideEffects: None
+    timeoutSeconds: 30

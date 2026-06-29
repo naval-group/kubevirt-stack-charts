@@ -1,0 +1,9 @@
+apiVersion: v2
+name: kubevirt-ipam-controller
+description: IPAM controller for persistent VM IPs across restarts via Multus secondary networks
+type: application
+version: 0.6.1
+appVersion: "0.6.1"
+kubeVersion: ">=1.30.0-0"
+sources:
+  - https://github.com/kubevirt/ipam-extensions

@@ -1,0 +1,240 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: butane-operator-manager-role
+  labels:
+    app: butane-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  - validatingwebhookconfigurations
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - butane.operators.naval-group.com
+  resources:
+  - butaneconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - butane.operators.naval-group.com
+  resources:
+  - butaneconfigs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - butane.operators.naval-group.com
+  resources:
+  - butaneconfigs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - events.k8s.io
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: butane-operator-butaneconfig-editor-role
+  labels:
+    app: butane-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - butane.operators.naval-group.com
+  resources:
+  - butaneconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - butane.operators.naval-group.com
+  resources:
+  - butaneconfigs/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: butane-operator-butaneconfig-viewer-role
+  labels:
+    app: butane-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - butane.operators.naval-group.com
+  resources:
+  - butaneconfigs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - butane.operators.naval-group.com
+  resources:
+  - butaneconfigs/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: butane-operator-metrics-reader
+  labels:
+    app: butane-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: butane-operator-proxy-role
+  labels:
+    app: butane-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: butane-operator-manager-rolebinding
+  labels:
+    app: butane-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: butane-operator-manager-role
+subjects:
+  - kind: ServiceAccount
+    name: butane-operator-controller-manager
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: butane-operator-proxy-rolebinding
+  labels:
+    app: butane-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: butane-operator-proxy-role
+subjects:
+  - kind: ServiceAccount
+    name: butane-operator-controller-manager
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: butane-operator-leader-election-role
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: butane-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: butane-operator-leader-election-rolebinding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: butane-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: butane-operator-leader-election-role
+subjects:
+  - kind: ServiceAccount
+    name: butane-operator-controller-manager
+    namespace: {{ .Values.namespace }}

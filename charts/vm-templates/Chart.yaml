@@ -1,0 +1,7 @@
+apiVersion: v2
+name: kubevirt-vm-templates
+description: Curated VirtualMachineTemplate resources for common OSes (KubeVirt 1.8 native format)
+type: application
+version: 1.8.1
+appVersion: "1.8.1"
+kubeVersion: ">=1.30.0-0"

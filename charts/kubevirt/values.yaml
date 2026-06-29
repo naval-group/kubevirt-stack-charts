@@ -1,0 +1,73 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+## Defaults to global.kubevirtNamespace
+namespace: ""
+version: v1.8.1
+
+operator:
+  replicas: 2
+  image:
+    repository: quay.io/kubevirt/virt-operator
+  resources:
+    requests:
+      cpu: 10m
+      memory: 450Mi
+  nodeSelector: {}
+  tolerations: []
+
+## virt-exportproxy is always deployed by KubeVirt (VMExport feature gate).
+## externalMode creates an Ingress + TLS cert so VMExport external links
+## are populated — required for Forklift cross-cluster cold migration.
+##
+## Requirements:
+##   - An Ingress controller with backend HTTPS support (e.g. ingress-nginx)
+##   - cert-manager (for automatic TLS cert generation)
+exportProxy:
+  externalMode:
+    enabled: false
+    ## FQDN for the export proxy (must be resolvable from remote clusters)
+    hostname: ""
+    ## Ingress class name (e.g. nginx)
+    ingressClassName: ""
+    ## cert-manager issuer reference. If empty, a self-signed Issuer is created.
+    ## Example for an existing ClusterIssuer:
+    ##   issuerRef:
+    ##     name: letsencrypt-prod
+    ##     kind: ClusterIssuer
+    certManager:
+      issuerRef: {}
+
+cr:
+  configuration:
+    developerConfiguration:
+      featureGates: []
+      ## Use software emulation for VMs (no /dev/kvm required).
+      ## Useful for development and CI environments without nested virt.
+      useEmulation: false
+    network: {}
+    migrations: {}
+    liveUpdateConfiguration: {}
+    evictionStrategy: ""
+    permittedHostDevices: {}
+    ## Mediated devices configuration for vGPU passthrough.
+    ## Example:
+    ##   mediatedDevicesConfiguration:
+    ##     mediatedDeviceTypes:
+    ##       - nvidia-222
+    ##       - nvidia-228
+    ##     nodeMediatedDeviceTypes:
+    ##       - nodeSelector:
+    ##           feature.node.kubernetes.io/pci-10de.present: "true"
+    ##         mediatedDeviceTypes:
+    ##           - nvidia-222
+    mediatedDevicesConfiguration: {}
+  imagePullPolicy: IfNotPresent
+  monitorNamespace: ""
+  monitorAccount: ""
+  customizeComponents: {}
+  workloadUpdateStrategy: {}
+  certificateRotateStrategy: {}

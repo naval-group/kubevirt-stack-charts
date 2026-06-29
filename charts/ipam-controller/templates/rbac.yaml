@@ -1,0 +1,123 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kubevirt-ipam-controller-manager-role
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - kubevirt.io
+    resources:
+      - virtualmachines
+      - virtualmachineinstances
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - kubevirt.io
+    resources:
+      - virtualmachines/finalizers
+      - virtualmachineinstances/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - k8s.cni.cncf.io
+    resources:
+      - ipamclaims
+      - network-attachment-definitions
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - k8s.cni.cncf.io
+    resources:
+      - ipamclaims
+    verbs:
+      - create
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubevirt-ipam-controller-manager-rolebinding
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubevirt-ipam-controller-manager-role
+subjects:
+  - kind: ServiceAccount
+    name: kubevirt-ipam-controller-manager
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kubevirt-ipam-controller-leader-election-role
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kubevirt-ipam-controller-leader-election-rolebinding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kubevirt-ipam-controller-leader-election-role
+subjects:
+  - kind: ServiceAccount
+    name: kubevirt-ipam-controller-manager
+    namespace: {{ .Values.namespace }}

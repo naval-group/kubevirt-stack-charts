@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubevirt-ipam-controller-webhook-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 9443
+  selector:
+    app: ipam-virt-workloads
+    control-plane: manager

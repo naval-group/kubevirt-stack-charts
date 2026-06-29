@@ -1,0 +1,104 @@
+{{- if not .Values.rke2.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: multus
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: multus
+    tier: node
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: multus
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: multus
+        tier: node
+    spec:
+      serviceAccountName: multus
+      hostNetwork: true
+      hostPID: true
+      {{- if .Values.thick }}
+      ## Thick plugin: multus runs as a daemon, CNI binary is a thin shim
+      containers:
+        - name: multus-daemon
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.image.repository "tag" .Values.image.tag "global" .Values.global) }}
+          command:
+            - /thick-plugin
+          args:
+            - daemon
+            - --multus-conf-file=auto
+            - --multus-autoconfig-dir=/host/etc/cni/net.d
+            - --cni-conf-dir=/host/etc/cni/net.d
+            - --multus-kubeconfig-file-host=/etc/cni/net.d/multus.d/multus.kubeconfig
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            privileged: true
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - name: cni-net-dir
+              mountPath: /host/etc/cni/net.d
+            - name: cni-bin-dir
+              mountPath: /host/opt/cni/bin
+            - name: hostroot
+              mountPath: /hostroot
+              mountPropagation: HostToContainer
+      {{- else }}
+      ## Thin plugin: install multus binary and config, then sleep
+      initContainers:
+        - name: install-multus-binary
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.image.repository "tag" .Values.image.tag "global" .Values.global) }}
+          command:
+            - cp
+            - /usr/src/multus-cni/bin/multus-shim
+            - /host/opt/cni/bin/multus-shim
+          volumeMounts:
+            - name: cni-bin-dir
+              mountPath: /host/opt/cni/bin
+      containers:
+        - name: multus
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.image.repository "tag" .Values.image.tag "global" .Values.global) }}
+          command:
+            - /thin_entrypoint
+          args:
+            - --multus-conf-file=auto
+            - --cni-conf-dir=/host/etc/cni/net.d
+            - --multus-kubeconfig-file-host=/etc/cni/net.d/multus.d/multus.kubeconfig
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            privileged: true
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - name: cni-net-dir
+              mountPath: /host/etc/cni/net.d
+            - name: cni-bin-dir
+              mountPath: /host/opt/cni/bin
+      {{- end }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      volumes:
+        - name: cni-net-dir
+          hostPath:
+            path: /etc/cni/net.d
+        - name: cni-bin-dir
+          hostPath:
+            path: /opt/cni/bin
+        {{- if .Values.thick }}
+        - name: hostroot
+          hostPath:
+            path: /
+        {{- end }}
+{{- end }}

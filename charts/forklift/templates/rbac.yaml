@@ -1,0 +1,164 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: forklift-operator
+  labels:
+    app: forklift
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - services
+      - services/finalizers
+      - endpoints
+      - persistentvolumeclaims
+      - events
+      - configmaps
+      - secrets
+      - serviceaccounts
+      - namespaces
+    verbs:
+      - "*"
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - daemonsets
+      - replicasets
+      - statefulsets
+    verbs:
+      - "*"
+  - apiGroups:
+      - route.openshift.io
+    resources:
+      - routes
+    verbs:
+      - "*"
+  - apiGroups:
+      - forklift.konveyor.io
+    resources:
+      - "*"
+    verbs:
+      - "*"
+  - apiGroups:
+      - kubevirt.io
+    resources:
+      - virtualmachines
+      - virtualmachineinstances
+    verbs:
+      - "*"
+  - apiGroups:
+      - instancetype.kubevirt.io
+    resources:
+      - "*"
+    verbs:
+      - "*"
+  - apiGroups:
+      - cdi.kubevirt.io
+    resources:
+      - datavolumes
+    verbs:
+      - "*"
+  - apiGroups:
+      - k8s.cni.cncf.io
+    resources:
+      - network-attachment-definitions
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+    verbs:
+      - "*"
+  - apiGroups:
+      - rbac.authorization.k8s.io
+    resources:
+      - clusterroles
+      - clusterrolebindings
+      - roles
+      - rolebindings
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - "*"
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - "*"
+  - apiGroups:
+      - cert-manager.io
+    resources:
+      - issuers
+      - certificates
+    verbs:
+      - "*"
+  - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - servicemonitors
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: forklift-operator
+  labels:
+    app: forklift
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: forklift-operator
+subjects:
+  - kind: ServiceAccount
+    name: forklift-operator
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: forklift-controller-admin
+  labels:
+    app: forklift
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: forklift-controller
+    namespace: {{ .Values.namespace }}
+  - kind: ServiceAccount
+    name: forklift-api
+    namespace: {{ .Values.namespace }}
+  - kind: ServiceAccount
+    name: forklift-populator-controller
+    namespace: {{ .Values.namespace }}

@@ -1,0 +1,16 @@
+apiVersion: aaq.kubevirt.io/v1alpha1
+kind: AAQ
+metadata:
+  name: aaq
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  imagePullPolicy: {{ .Values.cr.imagePullPolicy }}
+  {{- with .Values.cr.infra }}
+  infra:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.cr.workload }}
+  workload:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

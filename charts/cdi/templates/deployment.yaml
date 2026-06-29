@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdi-operator
+  namespace: {{ .Values.namespace }}
+  labels:
+    cdi.kubevirt.io: cdi-operator
+    name: cdi-operator
+    operator.cdi.kubevirt.io: ""
+    prometheus.cdi.kubevirt.io: "true"
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.operator.replicas }}
+  selector:
+    matchLabels:
+      name: cdi-operator
+      operator.cdi.kubevirt.io: ""
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        cdi.kubevirt.io: cdi-operator
+        name: cdi-operator
+        np.kubevirt.io/allow-access-cluster-services: "true"
+        operator.cdi.kubevirt.io: ""
+        prometheus.cdi.kubevirt.io: "true"
+    spec:
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: cdi.kubevirt.io
+                      operator: In
+                      values:
+                        - cdi-operator
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+      serviceAccountName: cdi-operator
+      containers:
+        - name: cdi-operator
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.image.repository "tag" .Values.version "global" .Values.global) }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DEPLOY_CLUSTER_RESOURCES
+              value: "true"
+            - name: OPERATOR_VERSION
+              value: {{ .Values.version }}
+            - name: CONTROLLER_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubevirt/cdi-controller" "tag" .Values.version "global" .Values.global) }}
+            - name: IMPORTER_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubevirt/cdi-importer" "tag" .Values.version "global" .Values.global) }}
+            - name: CLONER_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubevirt/cdi-cloner" "tag" .Values.version "global" .Values.global) }}
+            - name: OVIRT_POPULATOR_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubevirt/cdi-importer" "tag" .Values.version "global" .Values.global) }}
+            - name: APISERVER_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubevirt/cdi-apiserver" "tag" .Values.version "global" .Values.global) }}
+            - name: UPLOAD_SERVER_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubevirt/cdi-uploadserver" "tag" .Values.version "global" .Values.global) }}
+            - name: UPLOAD_PROXY_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubevirt/cdi-uploadproxy" "tag" .Values.version "global" .Values.global) }}
+            - name: VERBOSITY
+              value: "1"
+            - name: PULL_POLICY
+              value: IfNotPresent
+            - name: MONITORING_NAMESPACE
+          ports:
+            - containerPort: 8443
+              name: metrics
+              protocol: TCP
+            - containerPort: 8444
+              name: health
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8444
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8444
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 10
+          {{- with .Values.operator.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePolicy: FallbackToLogsOnError
+      nodeSelector:
+        {{- include "kubevirt-stack.nodeSelector" (dict "global" .Values.global.nodeSelector "local" .Values.operator.nodeSelector) | nindent 8 }}
+      securityContext:
+        runAsNonRoot: true
+      {{- $tolerations := include "kubevirt-stack.tolerations" (dict "global" .Values.global.tolerations "local" .Values.operator.tolerations) -}}
+      {{- if $tolerations }}
+      tolerations:
+        {{- $tolerations | nindent 8 }}
+      {{- end }}
+      {{- include "kubevirt-stack.imagePullSecrets" . | nindent 6 }}

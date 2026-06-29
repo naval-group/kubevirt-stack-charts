@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: virt-operator
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    kubevirt.io: virt-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.operator.replicas }}
+  selector:
+    matchLabels:
+      kubevirt.io: virt-operator
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        kubevirt.io: virt-operator
+        name: virt-operator
+        np.kubevirt.io/allow-access-cluster-services: "true"
+        prometheus.kubevirt.io: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: kubevirt.io
+                      operator: In
+                      values:
+                        - virt-operator
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+      serviceAccountName: kubevirt-operator
+      priorityClassName: kubevirt-cluster-critical
+      containers:
+        - name: virt-operator
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.image.repository "tag" .Values.version "global" .Values.global) }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - virt-operator
+          args:
+            - --port
+            - "8443"
+            - -v
+            - "2"
+          env:
+            - name: VIRT_OPERATOR_IMAGE
+              value: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.image.repository "tag" .Values.version "global" .Values.global) }}
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['olm.targetNamespaces']
+            - name: KUBEVIRT_VERSION
+              value: {{ .Values.version }}
+          ports:
+            - containerPort: 8443
+              name: metrics
+              protocol: TCP
+            - containerPort: 8444
+              name: webhooks
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            timeoutSeconds: 10
+          {{- with .Values.operator.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - name: kubevirt-operator-certs
+              mountPath: /etc/virt-operator/certificates
+              readOnly: true
+            - name: profile-data
+              mountPath: /profile-data
+      nodeSelector:
+        {{- include "kubevirt-stack.nodeSelector" (dict "global" .Values.global.nodeSelector "local" .Values.operator.nodeSelector) | nindent 8 }}
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        {{- $extra := include "kubevirt-stack.tolerations" (dict "global" .Values.global.tolerations "local" .Values.operator.tolerations) -}}
+        {{- if $extra }}
+        {{- $extra | nindent 8 }}
+        {{- end }}
+      {{- include "kubevirt-stack.imagePullSecrets" . | nindent 6 }}
+      volumes:
+        - name: kubevirt-operator-certs
+          secret:
+            secretName: kubevirt-operator-certs
+            optional: true
+        - name: profile-data
+          emptyDir: {}

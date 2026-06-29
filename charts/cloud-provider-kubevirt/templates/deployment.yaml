@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-provider-kubevirt
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: cloud-provider-kubevirt
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloud-provider-kubevirt
+  template:
+    metadata:
+      labels:
+        app: cloud-provider-kubevirt
+    spec:
+      serviceAccountName: cloud-provider-kubevirt
+      containers:
+        - name: cloud-provider-kubevirt
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.image.repository "tag" .Values.image.tag "global" .Values.global) }}
+          imagePullPolicy: IfNotPresent
+          args:
+            - --cloud-provider=kubevirt
+            - --cloud-config=/etc/cloud/cloud-config
+            - --v=2
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: cloud-config
+              mountPath: /etc/cloud
+              readOnly: true
+      nodeSelector:
+        {{- include "kubevirt-stack.nodeSelector" (dict "global" .Values.global.nodeSelector "local" .Values.nodeSelector) | nindent 8 }}
+      {{- $tolerations := include "kubevirt-stack.tolerations" (dict "global" .Values.global.tolerations "local" .Values.tolerations) -}}
+      {{- if $tolerations }}
+      tolerations:
+        {{- $tolerations | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: cloud-config
+          secret:
+            secretName: cloud-provider-kubevirt-config
+            optional: true

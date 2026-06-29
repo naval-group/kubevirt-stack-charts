@@ -1,0 +1,18 @@
+apiVersion: hostpathprovisioner.kubevirt.io/v1beta1
+kind: HostPathProvisioner
+metadata:
+  name: hostpath-provisioner
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  imagePullPolicy: IfNotPresent
+  storagePools:
+    {{- if .Values.storagePools }}
+    {{- toYaml .Values.storagePools | nindent 4 }}
+    {{- else }}
+    - name: local
+      path: {{ .Values.storagePath }}
+    {{- end }}
+  workload:
+    nodeSelector:
+      kubernetes.io/os: linux

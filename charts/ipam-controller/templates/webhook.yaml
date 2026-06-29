@@ -1,0 +1,82 @@
+{{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1") }}
+{{- fail (printf "cert-manager.io/v1 CRDs not found. Install cert-manager before installing %s." .Chart.Name) }}
+{{- end }}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: kubevirt-ipam-controller-selfsigned-issuer
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kubevirt-ipam-controller-serving-cert
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  secretName: webhook-server-cert
+  dnsNames:
+    - kubevirt-ipam-controller-webhook-service.{{ .Values.namespace }}.svc
+    - kubevirt-ipam-controller-webhook-service.{{ .Values.namespace }}.svc.cluster.local
+  issuerRef:
+    name: kubevirt-ipam-controller-selfsigned-issuer
+    kind: Issuer
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: kubevirt-ipam-controller-mutating-webhook-configuration
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Values.namespace }}/kubevirt-ipam-controller-serving-cert
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+webhooks:
+  - name: ipam-mutations.kubevirt.io
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: kubevirt-ipam-controller-webhook-service
+        namespace: {{ .Values.namespace }}
+        path: /mutate-v1-pod
+    failurePolicy: Ignore
+    rules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+    sideEffects: None
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kubevirt-ipam-controller-allow-ingress-to-ipam-ext-webhook
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: ipam-virt-workloads
+      control-plane: manager
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - port: 9443
+          protocol: TCP

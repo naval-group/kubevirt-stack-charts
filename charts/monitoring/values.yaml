@@ -1,0 +1,25 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+kubevirt:
+  ## Defaults to global.kubevirtNamespace
+  namespace: ""
+
+cdi:
+  enabled: true
+  namespace: cdi
+
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: ""
+    interval: 30s
+    labels: {}
+  prometheusRules:
+    enabled: true
+    namespace: ""
+    labels: {}

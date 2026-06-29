@@ -1,0 +1,62 @@
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: kubevirt
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.cr.certificateRotateStrategy }}
+  certificateRotateStrategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  configuration:
+    developerConfiguration:
+      {{- with .Values.cr.configuration.developerConfiguration.featureGates }}
+      featureGates:
+        {{- toYaml . | nindent 8 }}
+      {{- else }}
+      featureGates: []
+      {{- end }}
+      {{- if .Values.cr.configuration.developerConfiguration.useEmulation }}
+      useEmulation: true
+      {{- end }}
+    {{- with .Values.cr.configuration.mediatedDevicesConfiguration }}
+    mediatedDevicesConfiguration:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.cr.configuration.network }}
+    network:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.cr.configuration.migrations }}
+    migrations:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.cr.configuration.liveUpdateConfiguration }}
+    liveUpdateConfiguration:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.cr.configuration.evictionStrategy }}
+    evictionStrategy: {{ . }}
+    {{- end }}
+    {{- with .Values.cr.configuration.permittedHostDevices }}
+    permittedHostDevices:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    imagePullPolicy: {{ .Values.cr.imagePullPolicy }}
+  {{- with .Values.cr.customizeComponents }}
+  customizeComponents:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  imagePullPolicy: {{ .Values.cr.imagePullPolicy }}
+  {{- with .Values.cr.monitorNamespace }}
+  monitorNamespace: {{ . }}
+  {{- end }}
+  {{- with .Values.cr.monitorAccount }}
+  monitorAccount: {{ . }}
+  {{- end }}
+  {{- with .Values.cr.workloadUpdateStrategy }}
+  workloadUpdateStrategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

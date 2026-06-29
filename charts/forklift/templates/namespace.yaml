@@ -1,0 +1,10 @@
+{{- if ne .Values.namespace .Release.Namespace }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespace }}
+  labels:
+    app: forklift
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+{{- end }}

@@ -1,0 +1,10 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+deleteProtection:
+  enabled: true
+  labelKey: kubevirt.io/delete-protection
+  labelValue: "true"

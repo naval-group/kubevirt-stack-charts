@@ -1,0 +1,9 @@
+apiVersion: v2
+name: kubemacpool
+description: KubeMacPool — MAC address management for KubeVirt VMs
+type: application
+version: 0.45.0
+appVersion: "0.45.0"
+kubeVersion: ">=1.30.0-0"
+sources:
+  - https://github.com/kubevirt/kubemacpool

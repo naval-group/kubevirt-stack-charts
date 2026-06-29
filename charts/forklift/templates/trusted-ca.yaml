@@ -1,0 +1,13 @@
+{{- if .Values.trustedCA }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forklift-trusted-ca
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: forklift
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+data:
+  ca-bundle.crt: |
+    {{- .Values.trustedCA | nindent 4 }}
+{{- end }}
