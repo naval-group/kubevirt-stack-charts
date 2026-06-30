@@ -1,0 +1,78 @@
+name: Release Charts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "charts/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+  pages: write
+
+jobs:
+  detect-changes:
+    name: Detect changed charts
+    runs-on: ubuntu-latest
+    outputs:
+      charts: ${{ steps.changed.outputs.charts }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Find changed charts
+        id: changed
+        run: |
+          # Compare against previous commit (or all charts on first run)
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            CHANGED=$(git diff --name-only HEAD~1 HEAD -- charts/ | cut -d/ -f2 | sort -u | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          else
+            CHANGED=$(ls -d charts/*/ | xargs -I{} basename {} | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          fi
+          echo "charts=$CHANGED" >> "$GITHUB_OUTPUT"
+          echo "Changed charts: $CHANGED"
+
+  release:
+    name: Package & Push
+    needs: detect-changes
+    if: needs.detect-changes.outputs.charts != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        chart: ${{ fromJson(needs.detect-changes.outputs.charts) }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v4.2.0
+
+      - name: Get chart version
+        id: version
+        run: |
+          VERSION=$(grep '^version:' charts/${{ matrix.chart }}/Chart.yaml | awk '{print $2}' | tr -d '"')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Chart: ${{ matrix.chart }} Version: $VERSION"
+
+      - name: Package chart
+        run: helm package charts/${{ matrix.chart }}
+
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io \
+            --username "${{ github.actor }}" --password-stdin
+
+      - name: Push to OCI (GHCR)
+        run: |
+          helm push ${{ matrix.chart }}-${{ steps.version.outputs.version }}.tgz \
+            oci://ghcr.io/${{ github.repository_owner }}/kubevirt-stack-charts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        with:
+          tag_name: ${{ matrix.chart }}-${{ steps.version.outputs.version }}
+          name: "${{ matrix.chart }} ${{ steps.version.outputs.version }}"
+          files: ${{ matrix.chart }}-${{ steps.version.outputs.version }}.tgz
+          generate_release_notes: true
+          make_latest: false

@@ -1,4 +1,6 @@
 repositoryID: kubevirt-stack-charts
 owners:
-  - name: Naval Group
-    email: opensource@naval-group.com
+  - name: Alexandre Knecht
+    email: knecht.alexandre@gmail.com
+  - name: Aymeric Deliencourt
+    email: aymeric.deliencourt@aydev.fr

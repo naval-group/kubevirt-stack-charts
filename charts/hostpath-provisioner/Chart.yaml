@@ -2,7 +2,7 @@ apiVersion: v2
 name: hostpath-provisioner
 description: HostPath Provisioner — local CSI storage for dev/test KubeVirt clusters
 type: application
-version: 0.25.0
+version: "0.1.0"
 appVersion: "0.25.0"
 kubeVersion: ">=1.30.0-0"
 sources:
