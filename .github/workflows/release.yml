@@ -71,6 +71,17 @@ jobs:
           helm push ${{ steps.chart.outputs.name }}-${{ steps.chart.outputs.version }}.tgz \
             oci://ghcr.io/${{ github.repository_owner }}/kubevirt-stack-charts
 
+      - name: Push Artifact Hub metadata
+        run: |
+          curl -sLO https://github.com/oras-project/oras/releases/download/v1.2.2/oras_1.2.2_linux_amd64.tar.gz
+          tar xzf oras_1.2.2_linux_amd64.tar.gz oras
+          echo "${{ secrets.GITHUB_TOKEN }}" | ./oras login ghcr.io \
+            --username "${{ github.actor }}" --password-stdin
+          ./oras push \
+            ghcr.io/${{ github.repository_owner }}/kubevirt-stack-charts/${{ steps.chart.outputs.name }}:artifacthub.io \
+            --config /dev/null:application/vnd.cncf.artifacthub.config.v1+yaml \
+            charts/${{ matrix.chart }}/artifacthub-repo.yml:application/vnd.cncf.artifacthub.repository-metadata.layer.v1.yaml
+
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
