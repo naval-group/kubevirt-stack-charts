@@ -19,7 +19,7 @@ jobs:
     outputs:
       charts: ${{ steps.changed.outputs.charts }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
 
@@ -44,16 +44,18 @@ jobs:
       matrix:
         chart: ${{ fromJson(needs.detect-changes.outputs.charts) }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v4.2.0
+      - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v4.2.0
 
-      - name: Get chart version
-        id: version
+      - name: Get chart name and version
+        id: chart
         run: |
+          NAME=$(grep '^name:' charts/${{ matrix.chart }}/Chart.yaml | awk '{print $2}' | tr -d '"')
           VERSION=$(grep '^version:' charts/${{ matrix.chart }}/Chart.yaml | awk '{print $2}' | tr -d '"')
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Chart: ${{ matrix.chart }} Version: $VERSION"
+          echo "Chart dir=${{ matrix.chart }} name=$NAME version=$VERSION"
 
       - name: Package chart
         run: helm package charts/${{ matrix.chart }}
@@ -65,14 +67,14 @@ jobs:
 
       - name: Push to OCI (GHCR)
         run: |
-          helm push ${{ matrix.chart }}-${{ steps.version.outputs.version }}.tgz \
+          helm push ${{ steps.chart.outputs.name }}-${{ steps.chart.outputs.version }}.tgz \
             oci://ghcr.io/${{ github.repository_owner }}/kubevirt-stack-charts
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
-          tag_name: ${{ matrix.chart }}-${{ steps.version.outputs.version }}
-          name: "${{ matrix.chart }} ${{ steps.version.outputs.version }}"
-          files: ${{ matrix.chart }}-${{ steps.version.outputs.version }}.tgz
+          tag_name: ${{ steps.chart.outputs.name }}-${{ steps.chart.outputs.version }}
+          name: "${{ steps.chart.outputs.name }} ${{ steps.chart.outputs.version }}"
+          files: ${{ steps.chart.outputs.name }}-${{ steps.chart.outputs.version }}.tgz
           generate_release_notes: true
           make_latest: false
