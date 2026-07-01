@@ -2,7 +2,7 @@ apiVersion: v2
 name: vm-console-proxy
 description: VM Console Proxy — VNC/console token generation for KubeVirt VMs
 type: application
-version: 0.8.0
+version: "0.1.0"
 appVersion: "0.8.0"
 kubeVersion: ">=1.30.0-0"
 sources:

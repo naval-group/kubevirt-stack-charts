@@ -2,7 +2,7 @@ apiVersion: v2
 name: forklift
 description: Forklift — VM migration from VMware/oVirt/OpenStack to KubeVirt
 type: application
-version: 2.11.3
+version: "0.1.0"
 appVersion: "2.11.3"
 kubeVersion: ">=1.30.0-0"
 sources:
