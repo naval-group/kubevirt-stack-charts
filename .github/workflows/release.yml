@@ -2,15 +2,12 @@ name: Release Charts
 
 on:
   push:
-    branches: [main]
-    paths:
-      - "charts/**"
-  workflow_dispatch:
+    tags:
+      - "v*"
 
 permissions:
   contents: write
   packages: write
-  pages: write
 
 jobs:
   detect-changes:
@@ -23,14 +20,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Find changed charts
+      - name: Find changed charts since previous tag
         id: changed
         run: |
-          # Compare against previous commit (or all charts on first run)
-          if git rev-parse HEAD~1 >/dev/null 2>&1; then
-            CHANGED=$(git diff --name-only HEAD~1 HEAD -- charts/ | cut -d/ -f2 | sort -u | jq -R -s -c 'split("\n") | map(select(. != ""))')
-          else
+          # Get previous tag
+          PREV_TAG=$(git tag --sort=-version:refname | head -2 | tail -1)
+          if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" = "${{ github.ref_name }}" ]; then
+            # First release — all charts
+            echo "First release, packaging all charts"
             CHANGED=$(ls -d charts/*/ | xargs -I{} basename {} | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          else
+            echo "Comparing $PREV_TAG -> ${{ github.ref_name }}"
+            CHANGED=$(git diff --name-only "$PREV_TAG" HEAD -- charts/ | cut -d/ -f2 | sort -u | jq -R -s -c 'split("\n") | map(select(. != ""))')
           fi
           echo "charts=$CHANGED" >> "$GITHUB_OUTPUT"
           echo "Changed charts: $CHANGED"
@@ -55,7 +56,6 @@ jobs:
           VERSION=$(grep '^version:' charts/${{ matrix.chart }}/Chart.yaml | awk '{print $2}' | tr -d '"')
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Chart dir=${{ matrix.chart }} name=$NAME version=$VERSION"
 
       - name: Package chart
         run: helm package charts/${{ matrix.chart }}
@@ -70,11 +70,7 @@ jobs:
           helm push ${{ steps.chart.outputs.name }}-${{ steps.chart.outputs.version }}.tgz \
             oci://ghcr.io/${{ github.repository_owner }}/kubevirt-stack-charts
 
-      - name: Create GitHub Release
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
-          tag_name: ${{ steps.chart.outputs.name }}-${{ steps.chart.outputs.version }}
-          name: "${{ steps.chart.outputs.name }} ${{ steps.chart.outputs.version }}"
           files: ${{ steps.chart.outputs.name }}-${{ steps.chart.outputs.version }}.tgz
-          generate_release_notes: true
-          make_latest: false
