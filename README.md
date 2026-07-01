@@ -2,6 +2,7 @@
 
 [![Lint](https://github.com/naval-group/kubevirt-stack-charts/actions/workflows/lint.yml/badge.svg)](https://github.com/naval-group/kubevirt-stack-charts/actions/workflows/lint.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/naval-group/kubevirt-stack-charts/badge)](https://scorecard.dev/viewer/?uri=github.com/naval-group/kubevirt-stack-charts)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubevirt-stack-charts)](https://artifacthub.io/packages/search?repo=kubevirt-stack-charts)
 [![License](https://img.shields.io/github/license/naval-group/kubevirt-stack-charts)](https://github.com/naval-group/kubevirt-stack-charts/blob/main/LICENSE)
 
 Community Helm charts for [KubeVirt](https://kubevirt.io) on vanilla Kubernetes. Each chart is independent and can be installed individually — pick only what you need.
