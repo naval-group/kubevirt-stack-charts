@@ -5,9 +5,7 @@ on:
     tags:
       - "v*"
 
-permissions:
-  contents: write
-  packages: write
+permissions: read-all
 
 jobs:
   detect-changes:
@@ -41,6 +39,9 @@ jobs:
     needs: detect-changes
     if: needs.detect-changes.outputs.charts != '[]'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     strategy:
       matrix:
         chart: ${{ fromJson(needs.detect-changes.outputs.charts) }}
