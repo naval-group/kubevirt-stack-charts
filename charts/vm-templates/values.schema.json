@@ -52,6 +52,12 @@
         }
       }
     },
+    "namespace": {
+      "title": "Namespace",
+      "description": "Override the namespace where resources are deployed.",
+      "type": "string",
+      "default": ""
+    },
     "vmTemplates": {
       "title": "VM Templates",
       "description": "Configuration for common VM templates.",
