@@ -7,9 +7,9 @@
   "properties": {
     "global": {
       "title": "Global Configuration",
-      "description": "Global settings shared across all subcharts.",
+      "description": "Global settings shared across all subcharts. Additional properties are allowed so parent umbrella charts can pass arbitrary global values through Helm.",
       "type": "object",
-      "additionalProperties": false,
+      "additionalProperties": true,
       "properties": {
         "imageRegistry": {
           "title": "Image Registry",
@@ -51,6 +51,12 @@
           "default": "kubevirt"
         }
       }
+    },
+    "namespace": {
+      "title": "Namespace",
+      "description": "Override the namespace where resources are deployed.",
+      "type": "string",
+      "default": ""
     },
     "deleteProtection": {
       "title": "Delete Protection",

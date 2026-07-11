@@ -7,9 +7,9 @@
   "properties": {
     "global": {
       "title": "Global Settings",
-      "description": "Global values shared across all sub-charts in the umbrella chart.",
+      "description": "Global values shared across all sub-charts in the umbrella chart. Additional properties are allowed because a parent umbrella chart may inject arbitrary global values that are consumed by other sub-charts and passed through Helm's global mechanism.",
       "type": "object",
-      "additionalProperties": false,
+      "additionalProperties": true,
       "properties": {
         "imageRegistry": {
           "title": "Image Registry",
@@ -89,7 +89,7 @@
       "title": "KubeVirt Version",
       "description": "Version tag of the KubeVirt release to deploy.",
       "type": "string",
-      "default": "v1.8.1"
+      "default": "v1.8.4"
     },
     "operator": {
       "title": "Operator Settings",
@@ -330,24 +330,7 @@
                   "type": "array",
                   "default": [],
                   "items": {
-                    "type": "string",
-                    "enum": [
-                      "LiveMigration",
-                      "Snapshot",
-                      "HotplugVolumes",
-                      "VMExport",
-                      "ExpandDisks",
-                      "HotplugNICs",
-                      "VMLiveUpdateFeatures",
-                      "NetworkBindingPlugins",
-                      "VolumesUpdateStrategy",
-                      "VolumeMigration",
-                      "Passt",
-                      "VMPersistentState",
-                      "AutoResourceLimitsGate",
-                      "AlignCPUs",
-                      "NodeRestriction"
-                    ]
+                    "type": "string"
                   }
                 },
                 "useEmulation": {
