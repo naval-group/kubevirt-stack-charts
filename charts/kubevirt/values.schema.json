@@ -89,7 +89,7 @@
       "title": "KubeVirt Version",
       "description": "Version tag of the KubeVirt release to deploy.",
       "type": "string",
-      "default": "v1.8.1"
+      "default": "v1.8.4"
     },
     "operator": {
       "title": "Operator Settings",
