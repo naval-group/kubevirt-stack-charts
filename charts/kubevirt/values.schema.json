@@ -330,24 +330,7 @@
                   "type": "array",
                   "default": [],
                   "items": {
-                    "type": "string",
-                    "enum": [
-                      "LiveMigration",
-                      "Snapshot",
-                      "HotplugVolumes",
-                      "VMExport",
-                      "ExpandDisks",
-                      "HotplugNICs",
-                      "VMLiveUpdateFeatures",
-                      "NetworkBindingPlugins",
-                      "VolumesUpdateStrategy",
-                      "VolumeMigration",
-                      "Passt",
-                      "VMPersistentState",
-                      "AutoResourceLimitsGate",
-                      "AlignCPUs",
-                      "NodeRestriction"
-                    ]
+                    "type": "string"
                   }
                 },
                 "useEmulation": {

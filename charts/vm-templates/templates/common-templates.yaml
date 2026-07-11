@@ -4,7 +4,7 @@ apiVersion: template.kubevirt.io/v1alpha1
 kind: VirtualMachineTemplate
 metadata:
   name: fedora-server
-  namespace: {{ .Values.vmTemplates.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+  namespace: {{ include "kubevirt-stack.namespace" . }}
   labels:
     os.template.kubevirt.io/fedora: "true"
     workload.template.kubevirt.io/server: "true"
@@ -13,84 +13,95 @@ metadata:
     description: "Fedora Server VM template"
     iconClass: icon-fedora
 spec:
+  message: "VM ${VM_NAME} created with ${MEMORY} memory. Login: fedora / ${PASSWORD}"
   parameters:
-    - name: NAME
-      description: "Name of the VirtualMachine"
+    - name: VM_NAME
+      displayName: VM Name
+      description: "Name for the virtual machine"
       required: true
-    - name: DISK_SIZE
-      description: "Size of the root disk"
-      value: "30Gi"
     - name: CPU_CORES
+      displayName: CPU Cores
       description: "Number of CPU cores"
       value: "2"
     - name: MEMORY
-      description: "Amount of memory"
+      displayName: Memory
+      description: "Memory allocation (e.g. 1Gi, 2Gi)"
       value: "4Gi"
-  objects:
-    - apiVersion: kubevirt.io/v1
-      kind: VirtualMachine
-      metadata:
-        name: ${NAME}
-        labels:
-          app: ${NAME}
-          kubevirt.io/os: linux
-      spec:
-        running: false
-        template:
-          metadata:
-            labels:
-              kubevirt.io/domain: ${NAME}
+    - name: DISK_SIZE
+      displayName: Disk Size
+      description: "Size of the root disk"
+      value: "30Gi"
+    - name: PASSWORD
+      displayName: Password
+      description: "Login password"
+      from: "[a-zA-Z0-9]{12}"
+      generate: expression
+  virtualMachine:
+    apiVersion: kubevirt.io/v1
+    kind: VirtualMachine
+    metadata:
+      name: ${VM_NAME}
+    spec:
+      runStrategy: Always
+      template:
+        metadata:
+          labels:
+            kubevirt.io/domain: ${VM_NAME}
+        spec:
+          domain:
+            cpu:
+              cores: {{ `"${{CPU_CORES}}"` }}
+            resources:
+              requests:
+                memory: ${MEMORY}
+            devices:
+              disks:
+                - name: rootdisk
+                  disk:
+                    bus: virtio
+                - name: cloudinitdisk
+                  disk:
+                    bus: virtio
+              interfaces:
+                - name: default
+                  masquerade: {}
+              rng: {}
+            features:
+              acpi: {}
+          networks:
+            - name: default
+              pod: {}
+          volumes:
+            - name: rootdisk
+              dataVolume:
+                name: ${VM_NAME}-rootdisk
+            - name: cloudinitdisk
+              cloudInitNoCloud:
+                userData: |
+                  #cloud-config
+                  hostname: ${VM_NAME}
+                  password: ${PASSWORD}
+                  chpasswd:
+                    expire: false
+      dataVolumeTemplates:
+        - metadata:
+            name: ${VM_NAME}-rootdisk
           spec:
-            domain:
-              cpu:
-                cores: {{ `"${{CPU_CORES}}"` }}
-              memory:
-                guest: ${MEMORY}
-              devices:
-                disks:
-                  - name: rootdisk
-                    disk:
-                      bus: virtio
-                  - name: cloudinitdisk
-                    disk:
-                      bus: virtio
-                interfaces:
-                  - name: default
-                    masquerade: {}
-                rng: {}
-              features:
-                acpi: {}
-            networks:
-              - name: default
-                pod: {}
-            volumes:
-              - name: rootdisk
-                dataVolume:
-                  name: ${NAME}-rootdisk
-              - name: cloudinitdisk
-                cloudInitNoCloud:
-                  userData: |
-                    #cloud-config
-                    hostname: ${NAME}
-        dataVolumeTemplates:
-          - metadata:
-              name: ${NAME}-rootdisk
-            spec:
-              storage:
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: ${DISK_SIZE}
-              source:
-                registry:
-                  url: docker://quay.io/containerdisks/fedora:latest
+            storage:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: ${DISK_SIZE}
+            source:
+              registry:
+                url: docker://quay.io/containerdisks/fedora:latest
 ---
 apiVersion: template.kubevirt.io/v1alpha1
 kind: VirtualMachineTemplate
 metadata:
   name: ubuntu-server
-  namespace: {{ .Values.vmTemplates.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+  namespace: {{ include "kubevirt-stack.namespace" . }}
   labels:
     os.template.kubevirt.io/ubuntu: "true"
     workload.template.kubevirt.io/server: "true"
@@ -99,84 +110,95 @@ metadata:
     description: "Ubuntu Server VM template"
     iconClass: icon-ubuntu
 spec:
+  message: "VM ${VM_NAME} created with ${MEMORY} memory. Login: ubuntu / ${PASSWORD}"
   parameters:
-    - name: NAME
-      description: "Name of the VirtualMachine"
+    - name: VM_NAME
+      displayName: VM Name
+      description: "Name for the virtual machine"
       required: true
-    - name: DISK_SIZE
-      description: "Size of the root disk"
-      value: "30Gi"
     - name: CPU_CORES
+      displayName: CPU Cores
       description: "Number of CPU cores"
       value: "2"
     - name: MEMORY
-      description: "Amount of memory"
+      displayName: Memory
+      description: "Memory allocation (e.g. 1Gi, 2Gi)"
       value: "4Gi"
-  objects:
-    - apiVersion: kubevirt.io/v1
-      kind: VirtualMachine
-      metadata:
-        name: ${NAME}
-        labels:
-          app: ${NAME}
-          kubevirt.io/os: linux
-      spec:
-        running: false
-        template:
-          metadata:
-            labels:
-              kubevirt.io/domain: ${NAME}
+    - name: DISK_SIZE
+      displayName: Disk Size
+      description: "Size of the root disk"
+      value: "30Gi"
+    - name: PASSWORD
+      displayName: Password
+      description: "Login password"
+      from: "[a-zA-Z0-9]{12}"
+      generate: expression
+  virtualMachine:
+    apiVersion: kubevirt.io/v1
+    kind: VirtualMachine
+    metadata:
+      name: ${VM_NAME}
+    spec:
+      runStrategy: Always
+      template:
+        metadata:
+          labels:
+            kubevirt.io/domain: ${VM_NAME}
+        spec:
+          domain:
+            cpu:
+              cores: {{ `"${{CPU_CORES}}"` }}
+            resources:
+              requests:
+                memory: ${MEMORY}
+            devices:
+              disks:
+                - name: rootdisk
+                  disk:
+                    bus: virtio
+                - name: cloudinitdisk
+                  disk:
+                    bus: virtio
+              interfaces:
+                - name: default
+                  masquerade: {}
+              rng: {}
+            features:
+              acpi: {}
+          networks:
+            - name: default
+              pod: {}
+          volumes:
+            - name: rootdisk
+              dataVolume:
+                name: ${VM_NAME}-rootdisk
+            - name: cloudinitdisk
+              cloudInitNoCloud:
+                userData: |
+                  #cloud-config
+                  hostname: ${VM_NAME}
+                  password: ${PASSWORD}
+                  chpasswd:
+                    expire: false
+      dataVolumeTemplates:
+        - metadata:
+            name: ${VM_NAME}-rootdisk
           spec:
-            domain:
-              cpu:
-                cores: {{ `"${{CPU_CORES}}"` }}
-              memory:
-                guest: ${MEMORY}
-              devices:
-                disks:
-                  - name: rootdisk
-                    disk:
-                      bus: virtio
-                  - name: cloudinitdisk
-                    disk:
-                      bus: virtio
-                interfaces:
-                  - name: default
-                    masquerade: {}
-                rng: {}
-              features:
-                acpi: {}
-            networks:
-              - name: default
-                pod: {}
-            volumes:
-              - name: rootdisk
-                dataVolume:
-                  name: ${NAME}-rootdisk
-              - name: cloudinitdisk
-                cloudInitNoCloud:
-                  userData: |
-                    #cloud-config
-                    hostname: ${NAME}
-        dataVolumeTemplates:
-          - metadata:
-              name: ${NAME}-rootdisk
-            spec:
-              storage:
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: ${DISK_SIZE}
-              source:
-                registry:
-                  url: docker://quay.io/containerdisks/ubuntu:latest
+            storage:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: ${DISK_SIZE}
+            source:
+              registry:
+                url: docker://quay.io/containerdisks/ubuntu:latest
 ---
 apiVersion: template.kubevirt.io/v1alpha1
 kind: VirtualMachineTemplate
 metadata:
   name: centos-server
-  namespace: {{ .Values.vmTemplates.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+  namespace: {{ include "kubevirt-stack.namespace" . }}
   labels:
     os.template.kubevirt.io/centos: "true"
     workload.template.kubevirt.io/server: "true"
@@ -185,84 +207,95 @@ metadata:
     description: "CentOS Stream Server VM template"
     iconClass: icon-centos
 spec:
+  message: "VM ${VM_NAME} created with ${MEMORY} memory. Login: centos / ${PASSWORD}"
   parameters:
-    - name: NAME
-      description: "Name of the VirtualMachine"
+    - name: VM_NAME
+      displayName: VM Name
+      description: "Name for the virtual machine"
       required: true
-    - name: DISK_SIZE
-      description: "Size of the root disk"
-      value: "30Gi"
     - name: CPU_CORES
+      displayName: CPU Cores
       description: "Number of CPU cores"
       value: "2"
     - name: MEMORY
-      description: "Amount of memory"
+      displayName: Memory
+      description: "Memory allocation (e.g. 1Gi, 2Gi)"
       value: "4Gi"
-  objects:
-    - apiVersion: kubevirt.io/v1
-      kind: VirtualMachine
-      metadata:
-        name: ${NAME}
-        labels:
-          app: ${NAME}
-          kubevirt.io/os: linux
-      spec:
-        running: false
-        template:
-          metadata:
-            labels:
-              kubevirt.io/domain: ${NAME}
+    - name: DISK_SIZE
+      displayName: Disk Size
+      description: "Size of the root disk"
+      value: "30Gi"
+    - name: PASSWORD
+      displayName: Password
+      description: "Login password"
+      from: "[a-zA-Z0-9]{12}"
+      generate: expression
+  virtualMachine:
+    apiVersion: kubevirt.io/v1
+    kind: VirtualMachine
+    metadata:
+      name: ${VM_NAME}
+    spec:
+      runStrategy: Always
+      template:
+        metadata:
+          labels:
+            kubevirt.io/domain: ${VM_NAME}
+        spec:
+          domain:
+            cpu:
+              cores: {{ `"${{CPU_CORES}}"` }}
+            resources:
+              requests:
+                memory: ${MEMORY}
+            devices:
+              disks:
+                - name: rootdisk
+                  disk:
+                    bus: virtio
+                - name: cloudinitdisk
+                  disk:
+                    bus: virtio
+              interfaces:
+                - name: default
+                  masquerade: {}
+              rng: {}
+            features:
+              acpi: {}
+          networks:
+            - name: default
+              pod: {}
+          volumes:
+            - name: rootdisk
+              dataVolume:
+                name: ${VM_NAME}-rootdisk
+            - name: cloudinitdisk
+              cloudInitNoCloud:
+                userData: |
+                  #cloud-config
+                  hostname: ${VM_NAME}
+                  password: ${PASSWORD}
+                  chpasswd:
+                    expire: false
+      dataVolumeTemplates:
+        - metadata:
+            name: ${VM_NAME}-rootdisk
           spec:
-            domain:
-              cpu:
-                cores: {{ `"${{CPU_CORES}}"` }}
-              memory:
-                guest: ${MEMORY}
-              devices:
-                disks:
-                  - name: rootdisk
-                    disk:
-                      bus: virtio
-                  - name: cloudinitdisk
-                    disk:
-                      bus: virtio
-                interfaces:
-                  - name: default
-                    masquerade: {}
-                rng: {}
-              features:
-                acpi: {}
-            networks:
-              - name: default
-                pod: {}
-            volumes:
-              - name: rootdisk
-                dataVolume:
-                  name: ${NAME}-rootdisk
-              - name: cloudinitdisk
-                cloudInitNoCloud:
-                  userData: |
-                    #cloud-config
-                    hostname: ${NAME}
-        dataVolumeTemplates:
-          - metadata:
-              name: ${NAME}-rootdisk
-            spec:
-              storage:
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: ${DISK_SIZE}
-              source:
-                registry:
-                  url: docker://quay.io/containerdisks/centos-stream:9
+            storage:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: ${DISK_SIZE}
+            source:
+              registry:
+                url: docker://quay.io/containerdisks/centos-stream:9
 ---
 apiVersion: template.kubevirt.io/v1alpha1
 kind: VirtualMachineTemplate
 metadata:
   name: windows-desktop
-  namespace: {{ .Values.vmTemplates.namespace | default .Values.global.kubevirtNamespace | default "kubevirt" }}
+  namespace: {{ include "kubevirt-stack.namespace" . }}
   labels:
     os.template.kubevirt.io/windows: "true"
     workload.template.kubevirt.io/desktop: "true"
@@ -271,101 +304,105 @@ metadata:
     description: "Windows Desktop VM template (bring your own ISO)"
     iconClass: icon-windows
 spec:
+  message: "VM ${VM_NAME} created. Attach your Windows ISO PVC to complete installation."
   parameters:
-    - name: NAME
-      description: "Name of the VirtualMachine"
+    - name: VM_NAME
+      displayName: VM Name
+      description: "Name for the virtual machine"
       required: true
-    - name: DISK_SIZE
-      description: "Size of the root disk"
-      value: "60Gi"
     - name: CPU_CORES
+      displayName: CPU Cores
       description: "Number of CPU cores"
       value: "4"
     - name: MEMORY
-      description: "Amount of memory"
+      displayName: Memory
+      description: "Memory allocation (e.g. 1Gi, 2Gi)"
       value: "8Gi"
+    - name: DISK_SIZE
+      displayName: Disk Size
+      description: "Size of the root disk"
+      value: "60Gi"
     - name: ISO_PVC
+      displayName: Windows ISO PVC
       description: "Name of PVC containing Windows ISO"
       required: true
-  objects:
-    - apiVersion: kubevirt.io/v1
-      kind: VirtualMachine
-      metadata:
-        name: ${NAME}
-        labels:
-          app: ${NAME}
-          kubevirt.io/os: windows
-      spec:
-        running: false
-        template:
-          metadata:
-            labels:
-              kubevirt.io/domain: ${NAME}
+  virtualMachine:
+    apiVersion: kubevirt.io/v1
+    kind: VirtualMachine
+    metadata:
+      name: ${VM_NAME}
+    spec:
+      runStrategy: Manual
+      template:
+        metadata:
+          labels:
+            kubevirt.io/domain: ${VM_NAME}
+        spec:
+          domain:
+            cpu:
+              cores: {{ `"${{CPU_CORES}}"` }}
+            resources:
+              requests:
+                memory: ${MEMORY}
+            clock:
+              utc: {}
+              timer:
+                hpet:
+                  present: false
+                pit:
+                  tickPolicy: delay
+                rtc:
+                  tickPolicy: catchup
+                hyperv: {}
+            devices:
+              disks:
+                - name: rootdisk
+                  disk:
+                    bus: sata
+                - name: iso
+                  cdrom:
+                    bus: sata
+                - name: virtiocontainerdisk
+                  cdrom:
+                    bus: sata
+              interfaces:
+                - name: default
+                  masquerade: {}
+              tpm: {}
+              inputs:
+                - type: tablet
+                  bus: usb
+                  name: tablet
+            features:
+              acpi: {}
+              hyperv:
+                relaxed: {}
+                vapic: {}
+                spinlocks:
+                  spinlocks: 8191
+          networks:
+            - name: default
+              pod: {}
+          volumes:
+            - name: rootdisk
+              dataVolume:
+                name: ${VM_NAME}-rootdisk
+            - name: iso
+              persistentVolumeClaim:
+                claimName: ${ISO_PVC}
+            - name: virtiocontainerdisk
+              containerDisk:
+                image: quay.io/kubevirt/virtio-container-disk:latest
+      dataVolumeTemplates:
+        - metadata:
+            name: ${VM_NAME}-rootdisk
           spec:
-            domain:
-              cpu:
-                cores: {{ `"${{CPU_CORES}}"` }}
-              memory:
-                guest: ${MEMORY}
-              clock:
-                utc: {}
-                timer:
-                  hpet:
-                    present: false
-                  pit:
-                    tickPolicy: delay
-                  rtc:
-                    tickPolicy: catchup
-                  hyperv: {}
-              devices:
-                disks:
-                  - name: rootdisk
-                    disk:
-                      bus: sata
-                  - name: iso
-                    cdrom:
-                      bus: sata
-                  - name: virtiocontainerdisk
-                    cdrom:
-                      bus: sata
-                interfaces:
-                  - name: default
-                    masquerade: {}
-                tpm: {}
-                inputs:
-                  - type: tablet
-                    bus: usb
-                    name: tablet
-              features:
-                acpi: {}
-                hyperv:
-                  relaxed: {}
-                  vapic: {}
-                  spinlocks:
-                    spinlocks: 8191
-            networks:
-              - name: default
-                pod: {}
-            volumes:
-              - name: rootdisk
-                dataVolume:
-                  name: ${NAME}-rootdisk
-              - name: iso
-                persistentVolumeClaim:
-                  claimName: ${ISO_PVC}
-              - name: virtiocontainerdisk
-                containerDisk:
-                  image: quay.io/kubevirt/virtio-container-disk:latest
-        dataVolumeTemplates:
-          - metadata:
-              name: ${NAME}-rootdisk
-            spec:
-              storage:
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: ${DISK_SIZE}
-              source:
-                blank: {}
+            storage:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: ${DISK_SIZE}
+            source:
+              blank: {}
 {{- end }}
