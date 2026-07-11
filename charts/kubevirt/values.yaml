@@ -6,7 +6,7 @@ global:
 
 ## Defaults to global.kubevirtNamespace
 namespace: ""
-version: v1.8.1
+version: v1.8.4
 
 operator:
   replicas: 2
