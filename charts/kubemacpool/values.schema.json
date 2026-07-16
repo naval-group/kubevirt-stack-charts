@@ -28,7 +28,10 @@
           "title": "Global node selector",
           "description": "Node selector applied to all pods",
           "type": "object",
-          "default": {}
+          "default": {},
+          "additionalProperties": {
+            "type": "string"
+          }
         },
         "tolerations": {
           "title": "Global tolerations",
@@ -166,7 +169,10 @@
       "title": "Node selector",
       "description": "Node selector for KubeMacPool controller pods",
       "type": "object",
-      "default": {}
+      "default": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "tolerations": {
       "title": "Tolerations",
