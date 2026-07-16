@@ -24,7 +24,7 @@ Community Helm charts for [KubeVirt](https://kubevirt.io) on vanilla Kubernetes.
 | [monitoring](charts/monitoring) | — | ServiceMonitors and PrometheusRules for KubeVirt/CDI | v1.8.1 |
 | [hostpath-provisioner](charts/hostpath-provisioner) | [kubevirt/hostpath-provisioner-operator](https://github.com/kubevirt/hostpath-provisioner-operator) | HostPath CSI storage for dev/test environments | v0.25.0 |
 | [aaq](charts/aaq) | [kubevirt/application-aware-quota](https://github.com/kubevirt/application-aware-quota) | Application-Aware Quota for VM resource management | v1.7.0 |
-| [forklift](charts/forklift) | [kubev2v/forklift](https://github.com/kubev2v/forklift) | VM migration from external platforms (with inventory proxy) | v2.11.3 |
+| [forklift](charts/forklift) | [kubev2v/forklift](https://github.com/kubev2v/forklift) | VM migration from external platforms (with inventory proxy) | release-2.12 |
 | [cloud-provider-kubevirt](charts/cloud-provider-kubevirt) | [kubevirt/cloud-provider-kubevirt](https://github.com/kubevirt/cloud-provider-kubevirt) | Kubernetes cloud provider for KubeVirt | v0.6.0 |
 | [vm-templates](charts/vm-templates) | [kubevirt/virt-template](https://github.com/kubevirt/virt-template) | Common VM templates (Fedora, Ubuntu, CentOS, Windows) | v1.8.1 |
 
