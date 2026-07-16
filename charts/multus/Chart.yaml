@@ -5,6 +5,7 @@ type: application
 version: "0.1.0"
 appVersion: "4.1.4"
 kubeVersion: ">=1.30.0-0"
+icon: https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/docs/images/Multus.png
 sources:
   - https://github.com/k8snetworkplumbingwg/multus-cni
   - https://github.com/k8snetworkplumbingwg/multus-dynamic-networks-controller

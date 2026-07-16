@@ -5,6 +5,7 @@ type: application
 version: "0.1.0"
 appVersion: "1.8.4"
 kubeVersion: ">=1.30.0-0"
+icon: https://raw.githubusercontent.com/cncf/artwork/main/projects/kubevirt/icon/color/kubevirt-icon-color.svg
 home: https://kubevirt.io
 sources:
   - https://github.com/kubevirt/kubevirt
