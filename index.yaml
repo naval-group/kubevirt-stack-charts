@@ -1,0 +1,206 @@
+apiVersion: v1
+entries:
+  aaq:
+  - apiVersion: v2
+    appVersion: 1.7.0
+    created: "2026-07-16T13:53:23.381829508Z"
+    description: Application Aware Quota — quota management for KubeVirt workloads
+    digest: 6f6b165cf77a2f47881b82111e235ee47f40b7b19c9db0dd98881faab3e579bb
+    kubeVersion: '>=1.30.0-0'
+    name: aaq
+    sources:
+    - https://github.com/kubevirt/applications-aware-quota
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/aaq-0.2.0.tgz
+    version: 0.2.0
+  butane-operator:
+  - apiVersion: v2
+    appVersion: 0.1.1-rc2
+    created: "2026-07-16T13:53:23.382204721Z"
+    description: Butane Operator — converts Butane YAML to Ignition JSON for CoreOS
+      VMs
+    digest: af56c2b99cdd3dc5984ce42797cf1cd3d966114e648299f0b197fa71e161aab2
+    icon: https://raw.githubusercontent.com/Naval-Group/butane-operator/main/assets/logo.png
+    kubeVersion: '>=1.30.0-0'
+    name: butane-operator
+    sources:
+    - https://github.com/naval-group/butane-operator
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/butane-operator-0.2.0.tgz
+    version: 0.2.0
+  cdi:
+  - apiVersion: v2
+    appVersion: 1.65.0
+    created: "2026-07-16T13:53:23.384727409Z"
+    description: Containerized Data Importer — disk image management for KubeVirt
+    digest: 9fa512c50f1b0d71fb45d2a62103565d71af875133674080b7a6818717b9b7a2
+    home: https://kubevirt.io
+    icon: https://raw.githubusercontent.com/kubevirt/containerized-data-importer/main/assets/cdi_logo.png
+    kubeVersion: '>=1.30.0-0'
+    name: cdi
+    sources:
+    - https://github.com/kubevirt/containerized-data-importer
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/cdi-0.2.0.tgz
+    version: 0.2.0
+  cloud-provider-kubevirt:
+  - apiVersion: v2
+    appVersion: 0.6.0
+    created: "2026-07-16T13:53:23.384963361Z"
+    description: Cloud Provider KubeVirt — Kubernetes cloud provider for nested clusters
+    digest: de3bfd4b372e09582fca2d28b5f6f43740a6218c448a0ac608620770cc06596c
+    kubeVersion: '>=1.30.0-0'
+    name: cloud-provider-kubevirt
+    sources:
+    - https://github.com/kubevirt/cloud-provider-kubevirt
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/cloud-provider-kubevirt-0.2.0.tgz
+    version: 0.2.0
+  forklift:
+  - apiVersion: v2
+    appVersion: release-2.12
+    created: "2026-07-16T13:53:23.388897204Z"
+    description: Forklift — VM migration from VMware/oVirt/OpenStack to KubeVirt
+    digest: 83f53c2af98b5c00a54593ca900928773c7c1c948729b2570e97da6a6ee24a3e
+    icon: https://raw.githubusercontent.com/konveyor/website/main/src/images/forklift.svg
+    kubeVersion: '>=1.30.0-0'
+    name: forklift
+    sources:
+    - https://github.com/kubev2v/forklift
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/forklift-0.2.0.tgz
+    version: 0.2.0
+  hostpath-provisioner:
+  - apiVersion: v2
+    appVersion: 0.25.0
+    created: "2026-07-16T13:53:23.389761974Z"
+    description: HostPath Provisioner — local CSI storage for dev/test KubeVirt clusters
+    digest: e641fdc2bfd1a7958ad514cf8493d438306b26abad2b899506e470679d9d5773
+    kubeVersion: '>=1.30.0-0'
+    name: hostpath-provisioner
+    sources:
+    - https://github.com/kubevirt/hostpath-provisioner-operator
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/hostpath-provisioner-0.2.0.tgz
+    version: 0.2.0
+  kubemacpool:
+  - apiVersion: v2
+    appVersion: 0.45.0
+    created: "2026-07-16T13:53:23.390058059Z"
+    description: KubeMacPool — MAC address management for KubeVirt VMs
+    digest: afe6aacf9397382ec48afa04358668a1b9ad631abdbf97a24df0c437f0b53962
+    kubeVersion: '>=1.30.0-0'
+    name: kubemacpool
+    sources:
+    - https://github.com/kubevirt/kubemacpool
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/kubemacpool-0.2.0.tgz
+    version: 0.2.0
+  kubevirt:
+  - apiVersion: v2
+    appVersion: 1.8.4
+    created: "2026-07-16T13:53:23.392593692Z"
+    description: KubeVirt operator and CR — core VM lifecycle management
+    digest: 6d45eee33fee2279f447d2b2170c2b1949aa350922d8fc56147e55f035135150
+    home: https://kubevirt.io
+    icon: https://raw.githubusercontent.com/cncf/artwork/main/projects/kubevirt/icon/color/kubevirt-icon-color.svg
+    kubeVersion: '>=1.30.0-0'
+    name: kubevirt
+    sources:
+    - https://github.com/kubevirt/kubevirt
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/kubevirt-0.2.0.tgz
+    version: 0.2.0
+  kubevirt-delete-protection:
+  - apiVersion: v2
+    appVersion: 1.8.1
+    created: "2026-07-16T13:53:23.392786032Z"
+    description: ValidatingAdmissionPolicy to protect KubeVirt VMs from accidental
+      deletion
+    digest: 9b452e8f9178680aaafb1846f10a29d36170c4fffb052a9d5769131bd4ac20ae
+    kubeVersion: '>=1.30.0-0'
+    name: kubevirt-delete-protection
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/kubevirt-delete-protection-0.2.0.tgz
+    version: 0.2.0
+  kubevirt-ipam-controller:
+  - apiVersion: v2
+    appVersion: 0.6.1
+    created: "2026-07-16T13:53:23.393097736Z"
+    description: IPAM controller for persistent VM IPs across restarts via Multus
+      secondary networks
+    digest: 7224c6ee95f4216ed4e9cb06a83e331bc1b3cfa0362a4abfd0054fd3408f4c32
+    kubeVersion: '>=1.30.0-0'
+    name: kubevirt-ipam-controller
+    sources:
+    - https://github.com/kubevirt/ipam-extensions
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/kubevirt-ipam-controller-0.2.0.tgz
+    version: 0.2.0
+  kubevirt-monitoring:
+  - apiVersion: v2
+    appVersion: 1.8.1
+    created: "2026-07-16T13:53:23.393351893Z"
+    description: Prometheus ServiceMonitors and alerting rules for KubeVirt and CDI
+    digest: 44f95f891e7f777bc209a7882ef6b4c02a1ebe49bb68fc64659d718c18c48d17
+    kubeVersion: '>=1.30.0-0'
+    name: kubevirt-monitoring
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/kubevirt-monitoring-0.2.0.tgz
+    version: 0.2.0
+  kubevirt-vm-templates:
+  - apiVersion: v2
+    appVersion: 1.8.1
+    created: "2026-07-16T13:53:23.393630324Z"
+    description: Curated VirtualMachineTemplate resources for common OSes (KubeVirt
+      1.8 native format)
+    digest: 4212d7220ac4ead0d016f66ff041eba1992af84d72d8b9f2143b79fabfa70174
+    kubeVersion: '>=1.30.0-0'
+    name: kubevirt-vm-templates
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/kubevirt-vm-templates-0.2.0.tgz
+    version: 0.2.0
+  multus:
+  - apiVersion: v2
+    appVersion: 4.1.4
+    created: "2026-07-16T13:53:23.394019925Z"
+    description: Multus CNI with thick plugin and dynamic networks controller for
+      KubeVirt
+    digest: d44a9ead82679960a3c18bf316398f5014df8f4033438d77971a3e3863738dfa
+    icon: https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/docs/images/Multus.png
+    kubeVersion: '>=1.30.0-0'
+    name: multus
+    sources:
+    - https://github.com/k8snetworkplumbingwg/multus-cni
+    - https://github.com/k8snetworkplumbingwg/multus-dynamic-networks-controller
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/multus-0.2.0.tgz
+    version: 0.2.0
+  vm-console-proxy:
+  - apiVersion: v2
+    appVersion: 0.8.0
+    created: "2026-07-16T13:53:23.394295261Z"
+    description: VM Console Proxy — VNC/console token generation for KubeVirt VMs
+    digest: f39d2e732b264fc378739e3203a608b0750bd4dd8511ec642779e15a68b71eb0
+    kubeVersion: '>=1.30.0-0'
+    name: vm-console-proxy
+    sources:
+    - https://github.com/kubevirt/vm-console-proxy
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/vm-console-proxy-0.2.0.tgz
+    version: 0.2.0
+generated: "2026-07-16T13:53:23.379982466Z"
