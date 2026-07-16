@@ -13,7 +13,7 @@ Community Helm charts for [KubeVirt](https://kubevirt.io) on vanilla Kubernetes.
 
 | Chart | Upstream Project | Description | Version |
 |---|---|---|---|
-| [kubevirt](charts/kubevirt) | [kubevirt/kubevirt](https://github.com/kubevirt/kubevirt) | Core virtualization platform | v1.8.1 |
+| [kubevirt](charts/kubevirt) | [kubevirt/kubevirt](https://github.com/kubevirt/kubevirt) | Core virtualization platform | v1.8.4 |
 | [cdi](charts/cdi) | [kubevirt/containerized-data-importer](https://github.com/kubevirt/containerized-data-importer) | Disk image management | v1.65.0 |
 | [multus](charts/multus) | [k8snetworkplumbingwg/multus-cni](https://github.com/k8snetworkplumbingwg/multus-cni) | Multi-network CNI (standalone or RKE2 HelmChartConfig) | v4.1.4 |
 | [kubemacpool](charts/kubemacpool) | [k8snetworkplumbingwg/kubemacpool](https://github.com/k8snetworkplumbingwg/kubemacpool) | MAC address allocation for VMs | v0.45.0 |
@@ -25,6 +25,8 @@ Community Helm charts for [KubeVirt](https://kubevirt.io) on vanilla Kubernetes.
 | [hostpath-provisioner](charts/hostpath-provisioner) | [kubevirt/hostpath-provisioner-operator](https://github.com/kubevirt/hostpath-provisioner-operator) | HostPath CSI storage for dev/test environments | v0.25.0 |
 | [aaq](charts/aaq) | [kubevirt/application-aware-quota](https://github.com/kubevirt/application-aware-quota) | Application-Aware Quota for VM resource management | v1.7.0 |
 | [forklift](charts/forklift) | [kubev2v/forklift](https://github.com/kubev2v/forklift) | VM migration from external platforms (with inventory proxy) | release-2.12 |
+| [cloud-provider-kubevirt](charts/cloud-provider-kubevirt) | [kubevirt/cloud-provider-kubevirt](https://github.com/kubevirt/cloud-provider-kubevirt) | Kubernetes cloud provider for KubeVirt | v0.6.0 |
+| [vm-templates](charts/vm-templates) | [kubevirt/virt-template](https://github.com/kubevirt/virt-template) | Common VM templates (Fedora, Ubuntu, CentOS, Windows) | v1.8.1 |
 
 ## Prerequisites
 

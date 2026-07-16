@@ -2,7 +2,7 @@ apiVersion: v2
 name: multus
 description: Multus CNI with thick plugin and dynamic networks controller for KubeVirt
 type: application
-version: "0.1.0"
+version: "0.2.0"
 appVersion: "4.1.4"
 kubeVersion: ">=1.30.0-0"
 icon: https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/docs/images/Multus.png
