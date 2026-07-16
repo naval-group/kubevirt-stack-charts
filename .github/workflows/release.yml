@@ -86,3 +86,42 @@ jobs:
         uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
         with:
           files: ${{ steps.chart.outputs.name }}-${{ steps.chart.outputs.version }}.tgz
+
+  update-helm-repo:
+    name: Update Helm repo index
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v4.2.0
+
+      - name: Download release assets
+        run: |
+          gh release download "${{ github.ref_name }}" --pattern '*.tgz' --dir .
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update index.yaml
+        run: |
+          helm repo index . \
+            --url https://github.com/naval-group/kubevirt-stack-charts/releases/download/${{ github.ref_name }} \
+            --merge index.yaml || \
+          helm repo index . \
+            --url https://github.com/naval-group/kubevirt-stack-charts/releases/download/${{ github.ref_name }}
+
+      - name: Clean up tgz files
+        run: rm -f *.tgz
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.yaml
+          git diff --staged --quiet || git commit -m "Update Helm repo index for ${{ github.ref_name }}"
+          git push
