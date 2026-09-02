@@ -1,6 +1,7 @@
 {{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1") }}
 {{- fail (printf "cert-manager.io/v1 CRDs not found. Install cert-manager before installing %s." .Chart.Name) }}
 {{- end }}
+{{- if not .Values.certManager.issuer.name }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
@@ -40,6 +41,7 @@ metadata:
 spec:
   ca:
     secretName: hostpath-provisioner-ca
+{{- end }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -54,8 +56,11 @@ spec:
   dnsNames:
     - hostpath-provisioner-operator-webhook-service.{{ .Values.namespace }}.svc
   issuerRef:
-    name: hostpath-provisioner-ca-issuer
-    kind: Issuer
+    name: {{ .Values.certManager.issuer.name | default "hostpath-provisioner-ca-issuer" }}
+    kind: {{ .Values.certManager.issuer.kind }}
+    {{- if .Values.certManager.issuer.group }}
+    group: {{ .Values.certManager.issuer.group }}
+    {{- end }}
 ---
 apiVersion: v1
 kind: Service

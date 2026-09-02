@@ -21,3 +21,7 @@ tolerations: []
 
 certManager:
   reloader: true
+  issuer:
+    name: ""
+    kind: Issuer
+    group: cert-manager.io

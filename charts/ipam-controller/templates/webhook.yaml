@@ -1,6 +1,7 @@
 {{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1") }}
 {{- fail (printf "cert-manager.io/v1 CRDs not found. Install cert-manager before installing %s." .Chart.Name) }}
 {{- end }}
+{{- if not .Values.certManager.issuer.name }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
@@ -40,6 +41,7 @@ metadata:
 spec:
   ca:
     secretName: kubevirt-ipam-controller-ca
+{{- end }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -55,8 +57,11 @@ spec:
     - kubevirt-ipam-controller-webhook-service.{{ .Values.namespace }}.svc
     - kubevirt-ipam-controller-webhook-service.{{ .Values.namespace }}.svc.cluster.local
   issuerRef:
-    name: kubevirt-ipam-controller-ca-issuer
-    kind: Issuer
+    name: {{ .Values.certManager.issuer.name | default "kubevirt-ipam-controller-ca-issuer" }}
+    kind: {{ .Values.certManager.issuer.kind }}
+    {{- if .Values.certManager.issuer.group }}
+    group: {{ .Values.certManager.issuer.group }}
+    {{- end }}
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
