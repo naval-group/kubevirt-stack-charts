@@ -16,6 +16,34 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
+  name: kubevirt-ipam-controller-ca
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  isCA: true
+  commonName: kubevirt-ipam-controller-ca
+  secretName: kubevirt-ipam-controller-ca
+  issuerRef:
+    name: kubevirt-ipam-controller-selfsigned-issuer
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: kubevirt-ipam-controller-ca-issuer
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: ipam-virt-workloads
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  ca:
+    secretName: kubevirt-ipam-controller-ca
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
   name: kubevirt-ipam-controller-serving-cert
   namespace: {{ .Values.namespace }}
   labels:
@@ -27,7 +55,7 @@ spec:
     - kubevirt-ipam-controller-webhook-service.{{ .Values.namespace }}.svc
     - kubevirt-ipam-controller-webhook-service.{{ .Values.namespace }}.svc.cluster.local
   issuerRef:
-    name: kubevirt-ipam-controller-selfsigned-issuer
+    name: kubevirt-ipam-controller-ca-issuer
     kind: Issuer
 ---
 apiVersion: admissionregistration.k8s.io/v1

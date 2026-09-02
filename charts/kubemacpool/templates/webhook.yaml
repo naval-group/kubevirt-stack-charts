@@ -1,33 +1,78 @@
-{{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1") }}
-{{- fail (printf "cert-manager.io/v1 CRDs not found. Install cert-manager before installing %s." .Chart.Name) }}
-{{- end }}
-apiVersion: cert-manager.io/v1
-kind: Issuer
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: kubemacpool-selfsigned
+  name: kubemacpool-cert-manager
   namespace: {{ .Values.namespace }}
   labels:
     app: kubemacpool
+    control-plane: cert-manager
     {{- include "kubevirt-stack.labels" . | nindent 4 }}
 spec:
-  selfSigned: {}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: kubemacpool-service
-  namespace: {{ .Values.namespace }}
-  labels:
-    app: kubemacpool
-    {{- include "kubevirt-stack.labels" . | nindent 4 }}
-spec:
-  secretName: kubemacpool-service
-  issuerRef:
-    name: kubemacpool-selfsigned
-    kind: Issuer
-  dnsNames:
-    - kubemacpool-service.{{ .Values.namespace }}.svc
-    - kubemacpool-service.{{ .Values.namespace }}.svc.cluster.local
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      control-plane: cert-manager
+  template:
+    metadata:
+      labels:
+        app: kubemacpool
+        control-plane: cert-manager
+    spec:
+      serviceAccountName: kubemacpool
+      priorityClassName: system-cluster-critical
+      terminationGracePeriodSeconds: 5
+      {{- include "kubevirt-stack.imagePullSecrets" . | nindent 6 }}
+      containers:
+        - name: manager
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.image.repository "tag" .Values.image.tag "global" .Values.global) }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /manager
+          args:
+            - --v=production
+          env:
+            - name: RUN_CERT_MANAGER
+              value: ""
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CA_ROTATE_INTERVAL
+              value: {{ .Values.certManager.caRotateInterval | quote }}
+            - name: CA_OVERLAP_INTERVAL
+              value: {{ .Values.certManager.caOverlapInterval | quote }}
+            - name: CERT_ROTATE_INTERVAL
+              value: {{ .Values.certManager.certRotateInterval | quote }}
+            - name: CERT_OVERLAP_INTERVAL
+              value: {{ .Values.certManager.certOverlapInterval | quote }}
+          resources:
+            requests:
+              cpu: 30m
+              memory: 30Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 107
+        seccompProfile:
+          type: RuntimeDefault
+      nodeSelector:
+        {{- include "kubevirt-stack.nodeSelector" (dict "global" .Values.global.nodeSelector "local" .Values.nodeSelector) | nindent 8 }}
+      {{- $tolerations := include "kubevirt-stack.tolerations" (dict "global" .Values.global.tolerations "local" .Values.tolerations) -}}
+      {{- if $tolerations }}
+      tolerations:
+        {{- $tolerations | nindent 8 }}
+      {{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -52,8 +97,6 @@ metadata:
   labels:
     app: kubemacpool
     {{- include "kubevirt-stack.labels" . | nindent 4 }}
-  annotations:
-    cert-manager.io/inject-ca-from: {{ .Values.namespace }}/kubemacpool-service
 webhooks:
   - name: mutatepods.kubemacpool.io
     admissionReviewVersions:
@@ -63,7 +106,7 @@ webhooks:
         name: kubemacpool-service
         namespace: {{ .Values.namespace }}
         path: /mutate-pods
-    failurePolicy: Ignore
+    failurePolicy: Fail
     namespaceSelector:
       matchExpressions:
         - key: mutatepods.kubemacpool.io
@@ -88,7 +131,7 @@ webhooks:
         name: kubemacpool-service
         namespace: {{ .Values.namespace }}
         path: /mutate-virtualmachines
-    failurePolicy: Ignore
+    failurePolicy: Fail
     namespaceSelector:
       matchExpressions:
         - key: mutatevirtualmachines.kubemacpool.io
