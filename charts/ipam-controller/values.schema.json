@@ -170,6 +170,19 @@
       "items": {
         "type": "object"
       }
+    },
+    "certManager": {
+      "title": "Certificate manager",
+      "description": "cert-manager.io integration settings",
+      "type": "object",
+      "properties": {
+        "reloader": {
+          "type": "boolean",
+          "description": "Add Stakater Reloader annotations for automatic pod restart on cert renewal",
+          "default": true
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

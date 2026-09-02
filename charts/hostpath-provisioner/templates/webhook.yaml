@@ -5,13 +5,41 @@
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: selfsigned-issuer
+  name: hostpath-provisioner-selfsigned
   namespace: {{ .Values.namespace }}
   labels:
     app: hostpath-provisioner
     {{- include "kubevirt-stack.labels" . | nindent 4 }}
 spec:
   selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hostpath-provisioner-ca
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: hostpath-provisioner
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  isCA: true
+  commonName: hostpath-provisioner-ca
+  secretName: hostpath-provisioner-ca
+  issuerRef:
+    name: hostpath-provisioner-selfsigned
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: hostpath-provisioner-ca-issuer
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: hostpath-provisioner
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  ca:
+    secretName: hostpath-provisioner-ca
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -26,7 +54,8 @@ spec:
   dnsNames:
     - hostpath-provisioner-operator-webhook-service.{{ .Values.namespace }}.svc
   issuerRef:
-    name: selfsigned-issuer
+    name: hostpath-provisioner-ca-issuer
+    kind: Issuer
 ---
 apiVersion: v1
 kind: Service

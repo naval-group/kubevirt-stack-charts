@@ -185,7 +185,7 @@
     },
     "certManager": {
       "title": "Built-in certificate manager",
-      "description": "Configuration for the built-in certificate manager deployment",
+      "description": "Configuration for the built-in certificate manager deployment that handles CA and serving cert rotation",
       "type": "object",
       "properties": {
         "caRotateInterval": {
