@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "global": {
+      "type": "object",
+      "properties": {
+        "imageRegistry": {
+          "type": "string",
+          "description": "Override registry for all images"
+        },
+        "imagePullSecrets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Image pull secret names"
+        },
+        "nodeSelector": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Global nodeSelector applied to all pods"
+        },
+        "tolerations": {
+          "type": "array",
+          "items": { "type": "object" },
+          "description": "Global tolerations applied to all pods"
+        }
+      },
+      "additionalProperties": true
+    },
+    "namespace": {
+      "type": "string",
+      "description": "Namespace for whereabouts resources (default: kube-system)"
+    },
+    "image": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "Whereabouts container image repository"
+        },
+        "tag": {
+          "type": "string",
+          "description": "Whereabouts container image tag"
+        }
+      },
+      "required": ["repository", "tag"],
+      "additionalProperties": false
+    },
+    "resources": {
+      "type": "object",
+      "description": "Resource requests/limits for the DaemonSet pods"
+    },
+    "tolerations": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Tolerations for the DaemonSet pods"
+    },
+    "nodeSelector": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Node selector for the DaemonSet pods"
+    },
+    "cniConf": {
+      "type": "object",
+      "properties": {
+        "confDir": {
+          "type": "string",
+          "description": "Host path for CNI configuration"
+        },
+        "binDir": {
+          "type": "string",
+          "description": "Host path for CNI binaries"
+        }
+      },
+      "additionalProperties": false
+    },
+    "cronExpression": {
+      "type": "string",
+      "description": "Cron schedule for IP reconciliation (default: daily at 4:30am)"
+    },
+    "reconciler": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Deploy the IP reconciler"
+        },
+        "logLevel": {
+          "type": "string",
+          "description": "Log level for the reconciler"
+        },
+        "resources": {
+          "type": "object",
+          "description": "Resource requests/limits for the reconciler"
+        }
+      },
+      "additionalProperties": false
+    },
+    "nodeSliceController": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Deploy the node-slice controller"
+        },
+        "resources": {
+          "type": "object",
+          "description": "Resource requests/limits for the node-slice controller"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

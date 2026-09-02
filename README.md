@@ -16,6 +16,7 @@ Community Helm charts for [KubeVirt](https://kubevirt.io) on vanilla Kubernetes.
 | [kubevirt](charts/kubevirt) | [kubevirt/kubevirt](https://github.com/kubevirt/kubevirt) | Core virtualization platform | v1.8.4 |
 | [cdi](charts/cdi) | [kubevirt/containerized-data-importer](https://github.com/kubevirt/containerized-data-importer) | Disk image management | v1.65.0 |
 | [multus](charts/multus) | [k8snetworkplumbingwg/multus-cni](https://github.com/k8snetworkplumbingwg/multus-cni) | Multi-network CNI (standalone or RKE2 HelmChartConfig) | v4.1.4 |
+| [whereabouts](charts/whereabouts) | [k8snetworkplumbingwg/whereabouts](https://github.com/k8snetworkplumbingwg/whereabouts) | Cluster-wide CNI IPAM plugin | v0.9.4 |
 | [kubemacpool](charts/kubemacpool) | [k8snetworkplumbingwg/kubemacpool](https://github.com/k8snetworkplumbingwg/kubemacpool) | MAC address allocation for VMs | v0.45.0 |
 | [butane-operator](charts/butane-operator) | [Naval-Group/butane-operator](https://github.com/Naval-Group/butane-operator) | Butane/Ignition transpiler for CoreOS VMs | v0.1.1-rc2 |
 | [vm-console-proxy](charts/vm-console-proxy) | [kubevirt/vm-console-proxy](https://github.com/kubevirt/vm-console-proxy) | Token-based VNC/serial console proxy | v0.8.0 |
@@ -51,6 +52,7 @@ helm install cdi charts/cdi -n cdi --create-namespace
 
 # Networking
 helm install multus charts/multus -n kube-system --set rke2.enabled=true  # for RKE2
+helm install whereabouts charts/whereabouts
 helm install kubemacpool charts/kubemacpool -n kubemacpool-system --create-namespace
 
 # Essentials

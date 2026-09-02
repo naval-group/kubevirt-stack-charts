@@ -1,0 +1,48 @@
+{{- if .Values.reconciler.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whereabouts-reconciler
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: whereabouts-reconciler
+  template:
+    metadata:
+      labels:
+        name: whereabouts-reconciler
+    spec:
+      serviceAccountName: whereabouts
+      {{- include "kubevirt-stack.imagePullSecrets" . | nindent 6 }}
+      containers:
+        - name: reconciler
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.image.repository "tag" .Values.image.tag "global" .Values.global) }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /ip-reconciler
+          args:
+            - -log-level
+            - {{ .Values.reconciler.logLevel }}
+          env:
+            - name: WHEREABOUTS_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.reconciler.resources | nindent 12 }}
+          volumeMounts:
+            - name: cron-scheduler-configmap
+              mountPath: /cron-schedule
+      volumes:
+        - name: cron-scheduler-configmap
+          configMap:
+            name: whereabouts-config
+            defaultMode: 0744
+            items:
+              - key: cron-expression
+                path: config
+{{- end }}

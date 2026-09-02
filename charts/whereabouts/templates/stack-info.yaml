@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubevirt-stack-info-{{ include "kubevirt-stack.name" . }}
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+    kubevirt-stack/info: "true"
+data:
+  chartName: {{ .Chart.Name | quote }}
+  chartVersion: {{ .Chart.Version | quote }}
+  appVersion: {{ .Chart.AppVersion | quote }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubevirt-stack-values-{{ include "kubevirt-stack.name" . }}
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+    kubevirt-stack/info: "true"
+type: Opaque
+stringData:
+  values.yaml: |
+    {{- .Values | toYaml | nindent 4 }}

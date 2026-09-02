@@ -1,0 +1,60 @@
+{{- if .Values.nodeSliceController.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whereabouts-controller
+  namespace: {{ include "kubevirt-stack.namespace" . }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whereabouts-controller
+  template:
+    metadata:
+      labels:
+        app: whereabouts-controller
+    spec:
+      serviceAccountName: whereabouts
+      {{- include "kubevirt-stack.imagePullSecrets" . | nindent 6 }}
+      containers:
+        - name: whereabouts
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.image.repository "tag" .Values.image.tag "global" .Values.global) }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /node-slice-controller
+          env:
+            - name: NODENAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: WHEREABOUTS_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.nodeSliceController.resources | nindent 12 }}
+          volumeMounts:
+            - name: cnibin
+              mountPath: /host/opt/cni/bin
+            - name: cni-net-dir
+              mountPath: /host/etc/cni/net.d
+            - name: cron-scheduler-configmap
+              mountPath: /cron-schedule
+      volumes:
+        - name: cnibin
+          hostPath:
+            path: {{ .Values.cniConf.binDir }}
+        - name: cni-net-dir
+          hostPath:
+            path: {{ .Values.cniConf.confDir }}
+        - name: cron-scheduler-configmap
+          configMap:
+            name: whereabouts-config
+            defaultMode: 0744
+            items:
+              - key: cron-expression
+                path: config
+{{- end }}

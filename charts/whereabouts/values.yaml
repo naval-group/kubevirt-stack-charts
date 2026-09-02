@@ -1,0 +1,52 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+namespace: kube-system
+
+image:
+  repository: ghcr.io/k8snetworkplumbingwg/whereabouts
+  tag: v0.9.4
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 50Mi
+  limits:
+    cpu: 100m
+    memory: 50Mi
+
+tolerations:
+  - operator: Exists
+    effect: NoSchedule
+
+nodeSelector: {}
+
+cniConf:
+  confDir: /etc/cni/net.d
+  binDir: /opt/cni/bin
+
+cronExpression: "30 4 * * *"
+
+reconciler:
+  enabled: true
+  logLevel: debug
+  resources:
+    requests:
+      cpu: 100m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 50Mi
+
+nodeSliceController:
+  enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 50Mi
