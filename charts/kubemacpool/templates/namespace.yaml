@@ -5,6 +5,7 @@ metadata:
   name: {{ .Values.namespace }}
   labels:
     app: kubemacpool
+    pod-security.kubernetes.io/enforce: restricted
     mutatepods.kubemacpool.io: ignore
     {{- include "kubevirt-stack.labels" . | nindent 4 }}
 {{- end }}

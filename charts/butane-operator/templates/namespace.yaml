@@ -6,5 +6,6 @@ metadata:
   name: {{ .Values.namespace }}
   labels:
     app: butane-operator
+    pod-security.kubernetes.io/enforce: restricted
     {{- include "kubevirt-stack.labels" . | nindent 4 }}
 {{- end }}
