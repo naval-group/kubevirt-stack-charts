@@ -8,6 +8,10 @@ metadata:
     app: ipam-virt-workloads
     control-plane: manager
     {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  {{- if .Values.certManager.reloader }}
+  annotations:
+    secret.reloader.stakater.com/reload: webhook-server-cert
+  {{- end }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:

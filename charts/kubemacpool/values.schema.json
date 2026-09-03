@@ -183,6 +183,34 @@
         "type": "object"
       }
     },
+    "certManager": {
+      "title": "Built-in certificate manager",
+      "description": "Configuration for the built-in certificate manager deployment that handles CA and serving cert rotation",
+      "type": "object",
+      "properties": {
+        "caRotateInterval": {
+          "type": "string",
+          "description": "CA certificate rotation interval",
+          "default": "8760h0m0s"
+        },
+        "caOverlapInterval": {
+          "type": "string",
+          "description": "CA certificate overlap interval during rotation",
+          "default": "24h0m0s"
+        },
+        "certRotateInterval": {
+          "type": "string",
+          "description": "Serving certificate rotation interval",
+          "default": "4380h0m0s"
+        },
+        "certOverlapInterval": {
+          "type": "string",
+          "description": "Serving certificate overlap interval during rotation",
+          "default": "24h0m0s"
+        }
+      },
+      "additionalProperties": false
+    },
     "enabled": {
       "title": "Enabled",
       "description": "Whether this component is enabled. Controlled by the parent chart.",
