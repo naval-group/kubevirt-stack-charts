@@ -16,3 +16,9 @@ replicas: 1
 resources: {}
 nodeSelector: {}
 tolerations: []
+
+certManager:
+  caRotateInterval: "8760h0m0s"
+  caOverlapInterval: "24h0m0s"
+  certRotateInterval: "4380h0m0s"
+  certOverlapInterval: "24h0m0s"

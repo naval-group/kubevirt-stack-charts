@@ -33,7 +33,7 @@ Community Helm charts for [KubeVirt](https://kubevirt.io) on vanilla Kubernetes.
 
 - Kubernetes >= 1.30
 - Helm >= 3.x
-- [cert-manager](https://cert-manager.io) (required by KubeMacPool, IPAM Controller, HostPath Provisioner)
+- [cert-manager](https://cert-manager.io) (required by IPAM Controller, HostPath Provisioner)
 
 Optional:
 - [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) (for monitoring)
@@ -217,7 +217,7 @@ Uninstall in reverse order of install to avoid webhook/finalizer issues. Operato
 
 Charts that depend on external CRDs include built-in validation and fail with a clear error message if prerequisites are missing:
 
-- **kubemacpool, ipam-controller, hostpath-provisioner**: require cert-manager
+- **ipam-controller, hostpath-provisioner**: require cert-manager
 - **monitoring**: requires kube-prometheus-stack (Prometheus Operator)
 - **kubevirt, cdi**: export/upload proxy features check for cert-manager only when enabled
 
