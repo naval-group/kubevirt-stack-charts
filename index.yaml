@@ -3,7 +3,20 @@ entries:
   aaq:
   - apiVersion: v2
     appVersion: 1.7.0
-    created: "2026-09-07T12:18:41.946225585Z"
+    created: "2026-09-08T18:36:02.87943116Z"
+    description: Application Aware Quota — quota management for KubeVirt workloads
+    digest: 3b6ec7969fee12744595c4d05c2e9055087717a87be3ba2d1e5515f76cffdab2
+    kubeVersion: '>=1.30.0-0'
+    name: aaq
+    sources:
+    - https://github.com/kubevirt/applications-aware-quota
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/aaq-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 1.7.0
+    created: "2026-09-08T18:36:02.877927274Z"
     description: Application Aware Quota — quota management for KubeVirt workloads
     digest: e0f674a8276490ee3e5a8c23756b1ad34931f88ce79e96b0d19500ccc0781f68
     kubeVersion: '>=1.30.0-0'
@@ -17,7 +30,22 @@ entries:
   butane-operator:
   - apiVersion: v2
     appVersion: 0.1.1-rc2
-    created: "2026-09-07T12:18:41.946629704Z"
+    created: "2026-09-08T18:36:02.880200515Z"
+    description: Butane Operator — converts Butane YAML to Ignition JSON for CoreOS
+      VMs
+    digest: cbda34906c542ed8c3db5b61d85e062c3c89b2bfdfe3f4db953b4b8531bd9f7c
+    icon: https://raw.githubusercontent.com/Naval-Group/butane-operator/main/assets/logo.png
+    kubeVersion: '>=1.30.0-0'
+    name: butane-operator
+    sources:
+    - https://github.com/naval-group/butane-operator
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/butane-operator-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 0.1.1-rc2
+    created: "2026-09-08T18:36:02.879841615Z"
     description: Butane Operator — converts Butane YAML to Ignition JSON for CoreOS
       VMs
     digest: 4e34356c63eba2aea6fa0ceee1fc7a44e1a0c7bdd1ef4120cea329d42b3f486a
@@ -33,7 +61,22 @@ entries:
   cdi:
   - apiVersion: v2
     appVersion: 1.65.0
-    created: "2026-09-07T12:18:41.949371311Z"
+    created: "2026-09-08T18:36:02.884671613Z"
+    description: Containerized Data Importer — disk image management for KubeVirt
+    digest: 3c9131238a0159dc4cf7572f87c3dfa320b837b1352f6a163a502f9175e6f96a
+    home: https://kubevirt.io
+    icon: https://raw.githubusercontent.com/kubevirt/containerized-data-importer/main/assets/cdi_logo.png
+    kubeVersion: '>=1.30.0-0'
+    name: cdi
+    sources:
+    - https://github.com/kubevirt/containerized-data-importer
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/cdi-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 1.65.0
+    created: "2026-09-08T18:36:02.88291159Z"
     description: Containerized Data Importer — disk image management for KubeVirt
     digest: 9b3b873c7f25fa4672b90fd0daa88c371011180af4550e295593f770ebf79675
     home: https://kubevirt.io
@@ -63,7 +106,21 @@ entries:
   forklift:
   - apiVersion: v2
     appVersion: release-2.12
-    created: "2026-09-07T12:18:41.954023359Z"
+    created: "2026-09-08T18:36:02.892797832Z"
+    description: Forklift — VM migration from VMware/oVirt/OpenStack to KubeVirt
+    digest: 6c85c03e27e22c5363702d237e744229e5f6aa7758d5a24a419017936d3af5b3
+    icon: https://raw.githubusercontent.com/konveyor/website/main/src/images/forklift.svg
+    kubeVersion: '>=1.30.0-0'
+    name: forklift
+    sources:
+    - https://github.com/kubev2v/forklift
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/forklift-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: release-2.12
+    created: "2026-09-08T18:36:02.888722993Z"
     description: Forklift — VM migration from VMware/oVirt/OpenStack to KubeVirt
     digest: ee40ac212fa20f237d9cf97bba437c043e80dda7307a4c7797024ee6ff4a4b6f
     icon: https://raw.githubusercontent.com/konveyor/website/main/src/images/forklift.svg
@@ -78,7 +135,20 @@ entries:
   hostpath-provisioner:
   - apiVersion: v2
     appVersion: 0.25.0
-    created: "2026-09-07T12:18:41.954926567Z"
+    created: "2026-09-08T18:36:02.894473858Z"
+    description: HostPath Provisioner — local CSI storage for dev/test KubeVirt clusters
+    digest: bd309e405c73ee923787a49bef055f96e61c695591d552261135c99af9d34702
+    kubeVersion: '>=1.30.0-0'
+    name: hostpath-provisioner
+    sources:
+    - https://github.com/kubevirt/hostpath-provisioner-operator
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/hostpath-provisioner-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 0.25.0
+    created: "2026-09-08T18:36:02.893645423Z"
     description: HostPath Provisioner — local CSI storage for dev/test KubeVirt clusters
     digest: ff480137da5a4be2cee13a0a1153e45195430b3cd263a74a1e0284492562dba2
     kubeVersion: '>=1.30.0-0'
@@ -92,7 +162,20 @@ entries:
   kubemacpool:
   - apiVersion: v2
     appVersion: 0.45.0
-    created: "2026-09-07T12:18:41.955202112Z"
+    created: "2026-09-08T18:36:02.895109173Z"
+    description: KubeMacPool — MAC address management for KubeVirt VMs
+    digest: 4700d9dd782e3de9f18a33767a5d130593b10529dad24caceea26232b2ffe4d8
+    kubeVersion: '>=1.30.0-0'
+    name: kubemacpool
+    sources:
+    - https://github.com/kubevirt/kubemacpool
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/kubemacpool-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 0.45.0
+    created: "2026-09-08T18:36:02.894800327Z"
     description: KubeMacPool — MAC address management for KubeVirt VMs
     digest: 8b6643a15b7c40c67971303c3dc4d0d4f2168ff2258de48d2875856cb636e04c
     kubeVersion: '>=1.30.0-0'
@@ -135,7 +218,21 @@ entries:
   kubevirt-ipam-controller:
   - apiVersion: v2
     appVersion: 0.6.1
-    created: "2026-09-07T12:18:41.955545108Z"
+    created: "2026-09-08T18:36:02.895918874Z"
+    description: IPAM controller for persistent VM IPs across restarts via Multus
+      secondary networks
+    digest: 84d6d25abe01c638bdec83023bd757e7f430e73b3105eb6a3286157b79589f97
+    kubeVersion: '>=1.30.0-0'
+    name: kubevirt-ipam-controller
+    sources:
+    - https://github.com/kubevirt/ipam-extensions
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/kubevirt-ipam-controller-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 0.6.1
+    created: "2026-09-08T18:36:02.895533014Z"
     description: IPAM controller for persistent VM IPs across restarts via Multus
       secondary networks
     digest: 50528a2a8027e17bb22fdc1969f7f409a363111128f6c8187a35f4300e715b5f
@@ -206,7 +303,21 @@ entries:
   whereabouts:
   - apiVersion: v2
     appVersion: 0.9.4
-    created: "2026-09-07T12:18:41.955886881Z"
+    created: "2026-09-08T18:36:02.896776193Z"
+    description: Whereabouts CNI IPAM plugin — cluster-wide IP address management
+      for Kubernetes
+    digest: e81cfe78a2f6cafdafcbc2db94df287c8ee8bd438c416068370af43df6223fa8
+    kubeVersion: '>=1.30.0-0'
+    name: whereabouts
+    sources:
+    - https://github.com/k8snetworkplumbingwg/whereabouts
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/whereabouts-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 0.9.4
+    created: "2026-09-08T18:36:02.896337595Z"
     description: Whereabouts CNI IPAM plugin — cluster-wide IP address management
       for Kubernetes
     digest: 12ef09f813ccebfcf152968ab0fad9de31bf0a7c603f0b4c08b4aa906260cc5f
@@ -218,4 +329,4 @@ entries:
     urls:
     - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/whereabouts-0.2.0.tgz
     version: 0.2.0
-generated: "2026-09-07T12:18:41.944404195Z"
+generated: "2026-09-08T18:36:02.875137337Z"
