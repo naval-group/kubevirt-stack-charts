@@ -119,6 +119,43 @@
         }
       }
     },
+    "certManager": {
+      "title": "Certificate manager",
+      "description": "cert-manager.io integration settings",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reloader": {
+          "type": "boolean",
+          "description": "Add Stakater Reloader annotations for automatic pod restart on cert renewal",
+          "default": true
+        },
+        "issuer": {
+          "title": "Issuer configuration",
+          "description": "Custom cert-manager Issuer or ClusterIssuer. When name is set, the built-in CA chain is skipped and the specified issuer signs the serving certificate directly.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of an existing Issuer or ClusterIssuer. Leave empty to use the built-in self-signed CA chain.",
+              "default": ""
+            },
+            "kind": {
+              "type": "string",
+              "description": "Kind of the issuer (Issuer or ClusterIssuer)",
+              "default": "Issuer",
+              "enum": ["Issuer", "ClusterIssuer"]
+            },
+            "group": {
+              "type": "string",
+              "description": "API group of the issuer",
+              "default": "cert-manager.io"
+            }
+          }
+        }
+      }
+    },
     "enabled": {
       "title": "Enabled",
       "description": "Whether this component is enabled. Controlled by the parent chart.",

@@ -7,6 +7,10 @@ metadata:
     app: hostpath-provisioner
     prometheus.hostpathprovisioner.kubevirt.io: "true"
     {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  {{- if .Values.certManager.reloader }}
+  annotations:
+    secret.reloader.stakater.com/reload: hostpath-provisioner-operator-webhook-service-cert
+  {{- end }}
 spec:
   replicas: 1
   selector:
