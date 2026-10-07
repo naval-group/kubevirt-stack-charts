@@ -97,7 +97,7 @@ webhooks:
         namespace: {{ .Values.namespace }}
         path: /validate-hostpathprovisioner-kubevirt-io-v1beta1-hostpathprovisioner
         port: 443
-    failurePolicy: Fail
+    failurePolicy: {{ .Values.webhook.failurePolicy | default "Ignore" }}
     matchPolicy: Equivalent
     rules:
       - apiGroups:

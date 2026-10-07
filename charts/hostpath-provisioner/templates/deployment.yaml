@@ -30,7 +30,7 @@ spec:
       {{- end }}
       containers:
         - name: hostpath-provisioner-operator
-          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.image.repository "tag" .Values.version "global" .Values.global) }}
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.images.operator.repository "tag" (.Values.operator.images.operator.tag | default .Values.version) "global" .Values.global) }}
           imagePullPolicy: IfNotPresent
           command:
             - hostpath-provisioner-operator
@@ -54,19 +54,19 @@ spec:
             - name: OPERATOR_NAME
               value: hostpath-provisioner-operator
             - name: OPERATOR_IMAGE
-              value: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.image.repository "tag" .Values.version "global" .Values.global) }}
+              value: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.images.operator.repository "tag" (.Values.operator.images.operator.tag | default .Values.version) "global" .Values.global) }}
             - name: PROVISIONER_IMAGE
-              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubevirt/hostpath-provisioner" "tag" .Values.version "global" .Values.global) }}
+              value: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.images.provisioner.repository "tag" (.Values.operator.images.provisioner.tag | default .Values.version) "global" .Values.global) }}
             - name: CSI_PROVISIONER_IMAGE
-              value: {{ include "kubevirt-stack.image" (dict "repository" "quay.io/kubevirt/hostpath-csi-driver" "tag" .Values.version "global" .Values.global) }}
+              value: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.images.csiDriver.repository "tag" (.Values.operator.images.csiDriver.tag | default .Values.version) "global" .Values.global) }}
             - name: NODE_DRIVER_REG_IMAGE
-              value: {{ include "kubevirt-stack.image" (dict "repository" "registry.k8s.io/sig-storage/csi-node-driver-registrar" "tag" "v2.2.0" "global" .Values.global) }}
+              value: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.images.nodeDriverRegistrar.repository "tag" .Values.operator.images.nodeDriverRegistrar.tag "global" .Values.global) }}
             - name: LIVENESS_PROBE_IMAGE
-              value: {{ include "kubevirt-stack.image" (dict "repository" "registry.k8s.io/sig-storage/livenessprobe" "tag" "v2.3.0" "global" .Values.global) }}
+              value: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.images.livenessProbe.repository "tag" .Values.operator.images.livenessProbe.tag "global" .Values.global) }}
             - name: CSI_SNAPSHOT_IMAGE
-              value: {{ include "kubevirt-stack.image" (dict "repository" "registry.k8s.io/sig-storage/csi-snapshotter" "tag" "v8.2.0" "global" .Values.global) }}
+              value: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.images.csiSnapshotter.repository "tag" .Values.operator.images.csiSnapshotter.tag "global" .Values.global) }}
             - name: CSI_SIG_STORAGE_PROVISIONER_IMAGE
-              value: {{ include "kubevirt-stack.image" (dict "repository" "registry.k8s.io/sig-storage/csi-provisioner" "tag" "v3.4.1" "global" .Values.global) }}
+              value: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.images.csiProvisioner.repository "tag" .Values.operator.images.csiProvisioner.tag "global" .Values.global) }}
             - name: VERBOSITY
               value: "3"
             - name: MONITORING_NAMESPACE
@@ -92,9 +92,7 @@ spec:
             periodSeconds: 5
             failureThreshold: 1
           resources:
-            requests:
-              cpu: 10m
-              memory: 150Mi
+            {{- toYaml .Values.operator.resources | nindent 12 }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
