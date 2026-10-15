@@ -6,6 +6,9 @@ metadata:
     {{- include "kubevirt-stack.labels" . | nindent 4 }}
   annotations:
     description: KubeVirt hostpath CSI provisioner
+    {{- if .Values.storageClass.isDefault }}
+    storageclass.kubernetes.io/is-default-class: "true"
+    {{- end }}
 provisioner: kubevirt.io.hostpath-provisioner
 parameters:
   storagePool: local

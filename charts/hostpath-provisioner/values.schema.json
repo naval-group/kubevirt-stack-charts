@@ -85,20 +85,6 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "image": {
-          "title": "Image",
-          "description": "Container image settings for the hostpath-provisioner operator.",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "repository": {
-              "title": "Repository",
-              "description": "Container image repository for the hostpath-provisioner operator.",
-              "type": "string",
-              "default": "quay.io/kubevirt/hostpath-provisioner-operator"
-            }
-          }
-        },
         "nodeSelector": {
           "title": "Node Selector",
           "description": "Node selector for scheduling the hostpath-provisioner operator pods.",
@@ -121,6 +107,39 @@
           "title": "Priority Class Name",
           "description": "PriorityClass for the hostpath-provisioner-operator pod.",
           "type": "string"
+        },
+        "resources": {
+          "title": "Resources",
+          "description": "CPU/Memory resource requests and limits for the operator container.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "requests": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "default": { "cpu": "10m", "memory": "150Mi" }
+            },
+            "limits": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "default": {}
+            }
+          }
+        },
+        "images": {
+          "title": "Images",
+          "description": "Container image overrides for the operator and sidecar images.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operator":           { "type": "object", "additionalProperties": true },
+            "provisioner":        { "type": "object", "additionalProperties": true },
+            "csiDriver":          { "type": "object", "additionalProperties": true },
+            "nodeDriverRegistrar":  { "type": "object", "additionalProperties": true },
+            "livenessProbe":        { "type": "object", "additionalProperties": true },
+            "csiSnapshotter":       { "type": "object", "additionalProperties": true },
+            "csiProvisioner":       { "type": "object", "additionalProperties": true }
+          }
         }
       }
     },
@@ -158,6 +177,28 @@
               "default": "cert-manager.io"
             }
           }
+        }
+      }
+    },
+    "storageClass": {
+      "title": "StorageClass Configuration",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "isDefault": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "webhook": {
+      "title": "Webhook Configuration",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "failurePolicy": {
+          "type": "string",
+          "default": "Ignore"
         }
       }
     },
