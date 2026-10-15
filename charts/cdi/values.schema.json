@@ -177,6 +177,11 @@
           "items": {
             "type": "object"
           }
+        },
+        "priorityClassName": {
+          "title": "Priority Class Name",
+          "description": "PriorityClass for the cdi-operator pod.",
+          "type": "string"
         }
       }
     },
@@ -274,6 +279,11 @@
             "IfNotPresent",
             "Never"
           ]
+        },
+        "priorityClass": {
+          "title": "Priority Class",
+          "description": "PriorityClass applied to the CDI control plane (cdi-apiserver, cdi-controller, cdi-uploadproxy) managed by the operator.",
+          "type": "string"
         },
         "infra": {
           "title": "Infrastructure Placement",

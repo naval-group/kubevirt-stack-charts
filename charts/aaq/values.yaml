@@ -14,9 +14,12 @@ operator:
   resources: {}
   nodeSelector: {}
   tolerations: []
+  priorityClassName: ""
 
 cr:
   imagePullPolicy: IfNotPresent
+  ## PriorityClass applied to the whole AAQ control plane (aaq-server, aaq-controller).
+  priorityClass: ""
   infra:
     nodeSelector:
       kubernetes.io/os: linux

@@ -25,6 +25,9 @@ spec:
         prometheus.hostpathprovisioner.kubevirt.io: "true"
     spec:
       serviceAccountName: hostpath-provisioner-operator
+      {{- with .Values.operator.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       containers:
         - name: hostpath-provisioner-operator
           image: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.image.repository "tag" .Values.version "global" .Values.global) }}

@@ -18,6 +18,7 @@ operator:
       memory: 450Mi
   nodeSelector: {}
   tolerations: []
+  priorityClassName: kubevirt-cluster-critical
 
 ## virt-exportproxy is always deployed by KubeVirt (VMExport feature gate).
 ## externalMode creates an Ingress + TLS cert so VMExport external links
@@ -68,6 +69,5 @@ cr:
   imagePullPolicy: IfNotPresent
   monitorNamespace: ""
   monitorAccount: ""
-  customizeComponents: {}
   workloadUpdateStrategy: {}
   certificateRotateStrategy: {}

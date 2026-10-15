@@ -12,10 +12,16 @@ metadata:
 spec:
   failurePolicy: reinstall
   valuesContent: |-
+    {{- with .Values.priorityClassName }}
+    priorityClassName: {{ . }}
+    {{- end }}
     thickPlugin:
       enabled: true
     dynamicNetworksController:
       enabled: true
+      {{- with .Values.dynamicNetworks.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       sockets:
         containerd: {{ .Values.rke2.criSocket }}
         multus: {{ .Values.rke2.multusSocket }}

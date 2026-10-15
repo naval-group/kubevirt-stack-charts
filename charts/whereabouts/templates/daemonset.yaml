@@ -72,5 +72,8 @@ spec:
                 path: config
       nodeSelector:
         {{- include "kubevirt-stack.nodeSelector" (dict "global" .Values.global.nodeSelector "local" .Values.nodeSelector) | nindent 8 }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       tolerations:
         {{- include "kubevirt-stack.tolerations" (dict "global" .Values.global.tolerations "local" .Values.tolerations) | nindent 8 }}

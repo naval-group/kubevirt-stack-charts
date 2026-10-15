@@ -171,6 +171,12 @@
         "type": "object"
       }
     },
+    "priorityClassName": {
+      "title": "Priority Class Name",
+      "description": "PriorityClass for the kubevirt-ipam-controller-manager pod.",
+      "type": "string",
+      "default": "system-cluster-critical"
+    },
     "certManager": {
       "title": "Certificate manager",
       "description": "cert-manager.io integration settings",

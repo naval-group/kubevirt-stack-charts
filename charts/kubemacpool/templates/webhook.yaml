@@ -21,7 +21,9 @@ spec:
         control-plane: cert-manager
     spec:
       serviceAccountName: kubemacpool
-      priorityClassName: system-cluster-critical
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       terminationGracePeriodSeconds: 5
       {{- include "kubevirt-stack.imagePullSecrets" . | nindent 6 }}
       containers:

@@ -17,6 +17,9 @@ spec:
         app: whereabouts-controller
     spec:
       serviceAccountName: whereabouts
+      {{- with .Values.nodeSliceController.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       {{- include "kubevirt-stack.imagePullSecrets" . | nindent 6 }}
       containers:
         - name: whereabouts

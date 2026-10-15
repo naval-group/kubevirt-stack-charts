@@ -233,6 +233,11 @@
               }
             }
           }
+        },
+        "priorityClassName": {
+          "title": "Priority Class Name",
+          "description": "PriorityClass for the virt-operator pod.",
+          "type": "string"
         }
       }
     },

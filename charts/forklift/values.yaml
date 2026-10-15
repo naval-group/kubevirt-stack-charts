@@ -14,6 +14,7 @@ operator:
   resources: {}
   nodeSelector: {}
   tolerations: []
+  priorityClassName: ""
 
 ## Trusted CA bundle for Forklift Provider connections.
 ## If your source clusters use certificates signed by a corporate CA,
@@ -44,3 +45,4 @@ inventoryProxy:
       memory: 16Mi
     limits:
       memory: 64Mi
+  priorityClassName: ""

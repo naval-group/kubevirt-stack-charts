@@ -79,6 +79,9 @@ spec:
         app: forklift-inventory-proxy
     spec:
       serviceAccountName: forklift-controller
+      {{- with .Values.inventoryProxy.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       containers:
         - name: openresty
           image: {{ include "kubevirt-stack.image" (dict "repository" .Values.inventoryProxy.image.repository "tag" .Values.inventoryProxy.image.tag "global" .Values.global) }}

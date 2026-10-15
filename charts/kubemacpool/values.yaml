@@ -8,7 +8,7 @@ namespace: kubemacpool-system
 
 image:
   repository: quay.io/kubevirt/kubemacpool
-  tag: v0.45.0
+  tag: v0.51.1
 
 rangeStart: "02:00:00:00:00:00"
 rangeEnd: "02:FF:FF:FF:FF:FF"
@@ -16,6 +16,7 @@ replicas: 1
 resources: {}
 nodeSelector: {}
 tolerations: []
+priorityClassName: system-cluster-critical
 
 certManager:
   caRotateInterval: "8760h0m0s"

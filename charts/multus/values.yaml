@@ -30,6 +30,8 @@ resources:
 tolerations:
   - operator: Exists
 
+priorityClassName: system-node-critical
+
 dynamicNetworks:
   enabled: true
   image:
@@ -41,3 +43,4 @@ dynamicNetworks:
     requests:
       cpu: 100m
       memory: 50Mi
+  priorityClassName: system-node-critical

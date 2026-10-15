@@ -177,6 +177,11 @@
           "items": {
             "type": "object"
           }
+        },
+        "priorityClassName": {
+          "title": "Priority Class Name",
+          "description": "PriorityClass for the forklift-operator pod.",
+          "type": "string"
         }
       }
     },
@@ -285,6 +290,11 @@
               }
             }
           }
+        },
+        "priorityClassName": {
+          "title": "Priority Class Name",
+          "description": "PriorityClass for the forklift-inventory-proxy pod.",
+          "type": "string"
         },
         "rbacProxy": {
           "title": "RBAC Proxy",

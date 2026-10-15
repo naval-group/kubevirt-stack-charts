@@ -18,6 +18,9 @@ spec:
         app: cloud-provider-kubevirt
     spec:
       serviceAccountName: cloud-provider-kubevirt
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       containers:
         - name: cloud-provider-kubevirt
           image: {{ include "kubevirt-stack.image" (dict "repository" .Values.image.repository "tag" .Values.image.tag "global" .Values.global) }}

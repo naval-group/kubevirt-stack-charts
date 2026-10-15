@@ -87,6 +87,9 @@ spec:
             - name: cni-bin-dir
               mountPath: /host/opt/cni/bin
       {{- end }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
       volumes:

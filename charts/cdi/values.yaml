@@ -14,6 +14,7 @@ operator:
   resources: {}
   nodeSelector: {}
   tolerations: []
+  priorityClassName: ""
 
 ## Expose CDI upload proxy externally for virtctl image-upload.
 ## Without this, virtctl needs --uploadproxy-url with a port-forward.
@@ -46,6 +47,8 @@ cr:
     ##       memory: 512Mi
     podResourceRequirements: {}
   imagePullPolicy: IfNotPresent
+  ## PriorityClass applied to the whole CDI control plane (cdi-apiserver, cdi-controller, cdi-uploadproxy).
+  priorityClass: ""
   infra:
     nodeSelector:
       kubernetes.io/os: linux

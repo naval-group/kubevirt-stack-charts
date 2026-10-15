@@ -17,6 +17,9 @@ spec:
         name: whereabouts-reconciler
     spec:
       serviceAccountName: whereabouts
+      {{- with .Values.reconciler.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       {{- include "kubevirt-stack.imagePullSecrets" . | nindent 6 }}
       containers:
         - name: reconciler

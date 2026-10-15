@@ -177,6 +177,11 @@
           "items": {
             "type": "object"
           }
+        },
+        "priorityClassName": {
+          "title": "Priority Class Name",
+          "description": "Pod operator PriorityClassName.",
+          "type": "string"
         }
       }
     },
@@ -196,6 +201,11 @@
             "IfNotPresent",
             "Never"
           ]
+        },
+        "priorityClass": {
+          "title": "Priority Class",
+          "description": "PriorityClass applied to the AAQ control plane (aaq-server, aaq-controller) managed by the operator.",
+          "type": "string"
         },
         "infra": {
           "title": "Infrastructure Placement",

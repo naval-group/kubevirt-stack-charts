@@ -116,6 +116,11 @@
           "items": {
             "type": "object"
           }
+        },
+        "priorityClassName": {
+          "title": "Priority Class Name",
+          "description": "PriorityClass for the hostpath-provisioner-operator pod.",
+          "type": "string"
         }
       }
     },

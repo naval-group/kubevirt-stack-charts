@@ -15,3 +15,4 @@ replicas: 1
 resources: {}
 nodeSelector: {}
 tolerations: []
+priorityClassName: ""

@@ -132,6 +132,9 @@ spec:
               mountPath: /run/multus/multus.sock
             - name: cri-socket
               mountPath: {{ .Values.dynamicNetworks.criSocket }}
+      {{- with .Values.dynamicNetworks.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
       volumes:

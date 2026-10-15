@@ -6,6 +6,9 @@ metadata:
     {{- include "kubevirt-stack.labels" . | nindent 4 }}
 spec:
   imagePullPolicy: {{ .Values.cr.imagePullPolicy }}
+  {{- with .Values.cr.priorityClass }}
+  priorityClass: {{ . }}
+  {{- end }}
   {{- with .Values.cr.infra }}
   infra:
     {{- toYaml . | nindent 4 }}

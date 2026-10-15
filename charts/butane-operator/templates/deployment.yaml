@@ -95,6 +95,9 @@ spec:
             capabilities:
               drop:
                 - ALL
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       nodeSelector:
         {{- include "kubevirt-stack.nodeSelector" (dict "global" .Values.global.nodeSelector "local" .Values.nodeSelector) | nindent 8 }}
       {{- $tolerations := include "kubevirt-stack.tolerations" (dict "global" .Values.global.tolerations "local" .Values.tolerations) -}}
@@ -104,6 +107,8 @@ spec:
       {{- end }}
       securityContext:
         runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: cert
           emptyDir: {}

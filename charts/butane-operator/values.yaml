@@ -26,3 +26,4 @@ resources:
 
 nodeSelector: {}
 tolerations: []
+priorityClassName: ""

@@ -18,6 +18,9 @@ spec:
         app: vm-console-proxy
     spec:
       serviceAccountName: vm-console-proxy
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       containers:
         - name: console-proxy
           image: {{ include "kubevirt-stack.image" (dict "repository" .Values.image.repository "tag" .Values.image.tag "global" .Values.global) }}

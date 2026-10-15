@@ -165,6 +165,11 @@
         "type": "object"
       }
     },
+    "priorityClassName": {
+      "title": "Priority Class Name",
+      "description": "PriorityClass for the cloud-provider-kubevirt pod.",
+      "type": "string"
+    },
     "enabled": {
       "title": "Enabled",
       "description": "Whether this component is enabled. Controlled by the parent chart.",

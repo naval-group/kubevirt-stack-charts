@@ -21,7 +21,9 @@ spec:
         control-plane: mac-controller-manager
     spec:
       serviceAccountName: kubemacpool
-      priorityClassName: system-cluster-critical
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       terminationGracePeriodSeconds: 5
       containers:
         - name: manager
@@ -47,6 +49,8 @@ spec:
               value: {{ .Values.rangeEnd | quote }}
             - name: KUBEVIRT_CLIENT_GO_SCHEME_REGISTRATION_VERSION
               value: v1
+            - name: TLS_MIN_VERSION
+              value: VersionTLS13
           ports:
             - containerPort: 8000
               name: webhook-server

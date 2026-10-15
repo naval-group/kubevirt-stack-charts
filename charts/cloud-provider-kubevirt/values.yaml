@@ -13,3 +13,4 @@ image:
 resources: {}
 nodeSelector: {}
 tolerations: []
+priorityClassName: ""

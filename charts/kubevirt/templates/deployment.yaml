@@ -34,7 +34,9 @@ spec:
                 topologyKey: kubernetes.io/hostname
               weight: 1
       serviceAccountName: kubevirt-operator
-      priorityClassName: kubevirt-cluster-critical
+      {{- with .Values.operator.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       containers:
         - name: virt-operator
           image: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.image.repository "tag" .Values.version "global" .Values.global) }}

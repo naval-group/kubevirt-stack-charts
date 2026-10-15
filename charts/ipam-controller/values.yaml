@@ -18,6 +18,7 @@ resources:
 
 nodeSelector: {}
 tolerations: []
+priorityClassName: system-cluster-critical
 
 certManager:
   reloader: true

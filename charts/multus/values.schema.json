@@ -196,6 +196,12 @@
         "type": "object"
       }
     },
+    "priorityClassName": {
+      "title": "Priority Class Name",
+      "description": "PriorityClass for the Multus daemonset pods.",
+      "type": "string",
+      "default": "system-node-critical"
+    },
     "dynamicNetworks": {
       "title": "Dynamic Networks Controller",
       "description": "Configuration for the Multus dynamic networks controller sidecar",
@@ -308,6 +314,12 @@
               }
             }
           }
+        },
+        "priorityClassName": {
+          "title": "Priority Class Name",
+          "description": "PriorityClass for the dynamic-networks-controller pods (also a DaemonSet).",
+          "type": "string",
+          "default": "system-node-critical"
         }
       }
     },

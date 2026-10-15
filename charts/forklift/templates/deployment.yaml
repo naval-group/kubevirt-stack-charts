@@ -21,6 +21,9 @@ spec:
         control-plane: forklift-operator
     spec:
       serviceAccountName: forklift-operator
+      {{- with .Values.operator.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       containers:
         - name: forklift-operator
           image: {{ include "kubevirt-stack.image" (dict "repository" .Values.operator.image.repository "tag" .Values.version "global" .Values.global) }}

@@ -55,6 +55,11 @@
       "items": { "type": "object" },
       "description": "Tolerations for the DaemonSet pods"
     },
+    "priorityClassName": {
+      "type": "string",
+      "description": "PriorityClass for the whereabouts DaemonSet pods",
+      "default": "system-node-critical"
+    },
     "nodeSelector": {
       "type": "object",
       "additionalProperties": { "type": "string" },
@@ -92,6 +97,11 @@
         "resources": {
           "type": "object",
           "description": "Resource requests/limits for the reconciler"
+        },
+        "priorityClassName": {
+          "type": "string",
+          "description": "PriorityClass for the reconciler pod",
+          "default": "system-cluster-critical"
         }
       },
       "additionalProperties": false
@@ -106,6 +116,11 @@
         "resources": {
           "type": "object",
           "description": "Resource requests/limits for the node-slice controller"
+        },
+        "priorityClassName": {
+          "type": "string",
+          "description": "PriorityClass for the node-slice controller pod",
+          "default": "system-cluster-critical"
         }
       },
       "additionalProperties": false

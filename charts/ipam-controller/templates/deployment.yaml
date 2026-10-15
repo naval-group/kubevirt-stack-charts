@@ -27,7 +27,9 @@ spec:
         control-plane: manager
     spec:
       serviceAccountName: kubevirt-ipam-controller-manager
-      priorityClassName: system-cluster-critical
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       terminationGracePeriodSeconds: 10
       containers:
         - name: manager

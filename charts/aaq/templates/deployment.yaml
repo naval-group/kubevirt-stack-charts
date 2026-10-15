@@ -72,6 +72,9 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           terminationMessagePolicy: FallbackToLogsOnError
+      {{- with .Values.operator.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       nodeSelector:
         {{- include "kubevirt-stack.nodeSelector" (dict "global" .Values.global.nodeSelector "local" .Values.operator.nodeSelector) | nindent 8 }}
       securityContext:

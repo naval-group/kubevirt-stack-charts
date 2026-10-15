@@ -204,6 +204,12 @@
         "type": "object"
       }
     },
+    "priorityClassName": {
+      "title": "Priority Class Name",
+      "description": "PriorityClass for the butane-operator-controller-manager pod.",
+      "type": "string",
+      "default": ""
+    },
     "enabled": {
       "title": "Enabled",
       "description": "Whether this component is enabled. Controlled by the parent chart.",
