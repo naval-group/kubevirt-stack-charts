@@ -52,7 +52,7 @@ snr:
   nodeSelector: {}
   tolerations: []
   config:
-    safeTimeToAssumeNodeRebootedSeconds: 180
+    safeTimeToAssumeNodeRebootedSeconds: 60
     isSoftwareRebootEnabled: true
     watchdogFilePath: /dev/watchdog
     hostPort: 30001
