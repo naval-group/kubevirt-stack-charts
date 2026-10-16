@@ -2,7 +2,7 @@ apiVersion: v2
 name: medik8s
 description: Medik8s node health management - NHC, FAR, SNR as toggleable components
 type: application
-version: "0.1.0"
+version: "0.2.0"
 appVersion: "0.12.0"
 kubeVersion: ">=1.25.0-0"
 sources:
