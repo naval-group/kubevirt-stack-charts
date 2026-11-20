@@ -23,3 +23,8 @@ certManager:
   caOverlapInterval: "24h0m0s"
   certRotateInterval: "4380h0m0s"
   certOverlapInterval: "24h0m0s"
+  ## Resources for the kubemacpool-cert-manager container
+  resources:
+    requests:
+      cpu: 30m
+      memory: 30Mi

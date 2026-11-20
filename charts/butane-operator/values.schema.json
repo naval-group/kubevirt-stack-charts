@@ -110,6 +110,75 @@
               "default": "v0.16.0"
             }
           }
+        },
+        "resources": {
+          "title": "RBAC Proxy Resources",
+          "description": "CPU and memory requests/limits for the kube-rbac-proxy sidecar.",
+          "type": "object",
+          "properties": {
+            "requests": {
+              "title": "Resource Requests",
+              "description": "Minimum resources required for scheduling.",
+              "type": "object",
+              "properties": {
+                "cpu": {
+                  "title": "CPU Request",
+                  "description": "CPU request (e.g. 100m, 1).",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "memory": {
+                  "title": "Memory Request",
+                  "description": "Memory request (e.g. 128Mi, 1Gi).",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              }
+            },
+            "limits": {
+              "title": "Resource Limits",
+              "description": "Maximum resources the container can use.",
+              "type": "object",
+              "properties": {
+                "cpu": {
+                  "title": "CPU Limit",
+                  "description": "CPU limit (e.g. 500m, 2).",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "memory": {
+                  "title": "Memory Limit",
+                  "description": "Memory limit (e.g. 512Mi, 2Gi).",
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              }
+            }
+          }
         }
       }
     },

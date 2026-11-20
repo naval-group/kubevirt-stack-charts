@@ -185,6 +185,74 @@
         }
       }
     },
+    "cr": {
+      "title": "ForkliftController Custom Resource",
+      "description": "Settings applied to the ForkliftController CR.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "componentResources": {
+          "title": "Component Resources",
+          "description": "Resource requests/limits for forklift-operator managed components, rendered as <component>_container_* CR fields. Empty = operator defaults.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "controller": {
+              "description": "forklift-controller main container.",
+              "$ref": "#/definitions/resources"
+            },
+            "inventory": {
+              "description": "forklift-controller inventory container.",
+              "$ref": "#/definitions/resources"
+            },
+            "api": {
+              "description": "forklift-api.",
+              "$ref": "#/definitions/resources"
+            },
+            "validation": {
+              "description": "forklift-validation.",
+              "$ref": "#/definitions/resources"
+            },
+            "ovaProxy": {
+              "description": "forklift-ova-proxy.",
+              "$ref": "#/definitions/resources"
+            },
+            "populator": {
+              "description": "Populator pods spawned during migrations (not the forklift-volume-populator-controller Deployment).",
+              "$ref": "#/definitions/resources"
+            },
+            "virtV2v": {
+              "description": "virt-v2v migration pods.",
+              "$ref": "#/definitions/resources"
+            },
+            "hooks": {
+              "description": "Migration hook pods.",
+              "$ref": "#/definitions/resources"
+            },
+            "ova": {
+              "description": "OVA provider server.",
+              "$ref": "#/definitions/resources"
+            },
+            "hyperv": {
+              "description": "HyperV provider server.",
+              "$ref": "#/definitions/resources"
+            },
+            "cliDownload": {
+              "description": "CLI download service.",
+              "$ref": "#/definitions/resources"
+            },
+            "uiPlugin": {
+              "description": "UI plugin.",
+              "$ref": "#/definitions/resources"
+            },
+            "mcpServer": {
+              "description": "MCP server.",
+              "$ref": "#/definitions/resources"
+            }
+          }
+        }
+      }
+    },
     "trustedCA": {
       "title": "Trusted CA Bundle",
       "description": "PEM-encoded CA certificate bundle for Forklift Provider connections. If your source clusters use certificates signed by a corporate or private CA, provide the full PEM bundle here. A ConfigMap will be created that can be referenced when creating Provider secrets.",
@@ -318,6 +386,64 @@
               }
             }
           }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "cpuQuantity": {
+      "title": "CPU Quantity",
+      "description": "Kubernetes CPU quantity (e.g. 100m, 1, 0.5).",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([eE][+-]?[0-9]+|m|k|M|G|T|P|E|Ki|Mi|Gi|Ti|Pi|Ei)?$"
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ]
+    },
+    "memoryQuantity": {
+      "title": "Memory Quantity",
+      "description": "Kubernetes memory quantity (e.g. 128Mi, 1Gi). The 'm' suffix is rejected: 128m would mean 0.128 bytes.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([eE][+-]?[0-9]+|k|M|G|T|P|E|Ki|Mi|Gi|Ti|Pi|Ei)?$"
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ]
+    },
+    "resourceList": {
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "$ref": "#/definitions/cpuQuantity"
+        },
+        "memory": {
+          "$ref": "#/definitions/memoryQuantity"
+        }
+      },
+      "additionalProperties": false,
+      "description": "cpu and memory only (the ForkliftController CR has no fields for other resources).",
+      "title": "Resource List"
+    },
+    "resources": {
+      "title": "Resource Requirements",
+      "description": "CPU and memory resource requests and limits.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requests": {
+          "$ref": "#/definitions/resourceList"
+        },
+        "limits": {
+          "$ref": "#/definitions/resourceList"
         }
       }
     }

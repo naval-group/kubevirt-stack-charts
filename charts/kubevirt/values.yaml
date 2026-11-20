@@ -66,7 +66,52 @@ cr:
     ##         mediatedDeviceTypes:
     ##           - nvidia-222
     mediatedDevicesConfiguration: {}
+    ## Resources for helper containers KubeVirt adds to VM-related pods
+    ## (spec.configuration.supportContainerResources). Empty = KubeVirt defaults.
+    ## Example:
+    ##   containerDisk:
+    ##     requests: {cpu: 1m, memory: 1M}
+    ##     limits: {cpu: 10m, memory: 40M}
+    supportContainerResources:
+      ## Container disk containers in virt-launcher pods: volume<name>,
+      ## volume<name>-init and the container-disk-binary init container
+      containerDisk: {}
+      ## Hotplug attachment pods (hp-volume-*)
+      hotplugDisk: {}
+      ## virtiofs filesystem containers
+      virtiofs: {}
+      ## Hook sidecar containers
+      sidecar: {}
+      ## VM export server pods
+      vmExport: {}
+      ## guest-console-log container in virt-launcher pods
+      guestConsoleLog: {}
   imagePullPolicy: IfNotPresent
+  ## Resource requests/limits for components deployed by virt-operator.
+  ## Empty = operator defaults. Each entry is rendered as a strategic-merge
+  ## patch in customizeComponents.patches (appended to any patches below).
+  ## Example:
+  ##   virtHandler:
+  ##     requests: {cpu: 10m, memory: 325Mi}
+  ##     limits: {memory: 1Gi}
+  componentResources:
+    virtApi: {}
+    virtController: {}
+    virtHandler: {}
+    ## virt-launcher init container of the virt-handler DaemonSet
+    virtHandlerInit: {}
+    ## pr-helper container of the virt-handler DaemonSet (no upstream defaults).
+    ## Only applied when the PersistentReservation feature gate is enabled.
+    virtHandlerPrHelper: {}
+    virtExportProxy: {}
+    ## Only deployed with the DecentralizedLiveMigration feature gate
+    virtSynchronizationController: {}
+    ## Only deployed with the Template feature gate
+    virtTemplateApiserver: {}
+    virtTemplateController: {}
+  ## Raw KubeVirt customizeComponents (patches / flags).
+  ## See https://kubevirt.io/user-guide/cluster_admin/customize_components/
+  customizeComponents: {}
   monitorNamespace: ""
   monitorAccount: ""
   workloadUpdateStrategy: {}
