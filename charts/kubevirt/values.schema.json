@@ -410,6 +410,38 @@
                   "default": true
                 }
               }
+            },
+            "supportContainerResources": {
+              "title": "Support Container Resources",
+              "description": "Resources for helper containers KubeVirt adds to VM-related pods, rendered as spec.configuration.supportContainerResources. Empty = KubeVirt defaults.",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "containerDisk": {
+                  "description": "Container disk volume containers in virt-launcher pods.",
+                  "$ref": "#/definitions/resourcesWithoutClaims"
+                },
+                "hotplugDisk": {
+                  "description": "Hotplug attachment pods.",
+                  "$ref": "#/definitions/resourcesWithoutClaims"
+                },
+                "virtiofs": {
+                  "description": "virtiofs filesystem containers.",
+                  "$ref": "#/definitions/resourcesWithoutClaims"
+                },
+                "sidecar": {
+                  "description": "Hook sidecar containers.",
+                  "$ref": "#/definitions/resourcesWithoutClaims"
+                },
+                "vmExport": {
+                  "description": "VM export server pods.",
+                  "$ref": "#/definitions/resourcesWithoutClaims"
+                },
+                "guestConsoleLog": {
+                  "description": "guest-console-log container in virt-launcher pods.",
+                  "$ref": "#/definitions/resourcesWithoutClaims"
+                }
+              }
             }
           }
         },
@@ -438,8 +470,39 @@
         },
         "customizeComponents": {
           "title": "Customize Components",
-          "description": "Patches to apply to KubeVirt-managed Deployments, DaemonSets, and other resources.",
+          "description": "Raw customizeComponents (patches/flags) passed to the operator CR. Patches generated from componentResources are appended.",
           "type": "object",
+          "properties": {
+            "patches": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "resourceName",
+                  "resourceType",
+                  "patch",
+                  "type"
+                ],
+                "properties": {
+                  "resourceName": {
+                    "type": "string"
+                  },
+                  "resourceType": {
+                    "type": "string"
+                  },
+                  "patch": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "flags": {
+              "type": "object"
+            }
+          },
           "default": {}
         },
         "workloadUpdateStrategy": {
@@ -453,6 +516,144 @@
           "description": "Strategy for rotating internal TLS certificates used by KubeVirt components.",
           "type": "object",
           "default": {}
+        },
+        "componentResources": {
+          "title": "Component Resources",
+          "description": "Resource requests/limits for virt-operator managed components, rendered as customizeComponents patches. Empty = operator defaults.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "virtApi": {
+              "description": "virt-api Deployment.",
+              "$ref": "#/definitions/resources"
+            },
+            "virtController": {
+              "description": "virt-controller Deployment.",
+              "$ref": "#/definitions/resources"
+            },
+            "virtHandler": {
+              "description": "virt-handler DaemonSet.",
+              "$ref": "#/definitions/resources"
+            },
+            "virtHandlerInit": {
+              "description": "virt-launcher init container of the virt-handler DaemonSet.",
+              "$ref": "#/definitions/resources"
+            },
+            "virtHandlerPrHelper": {
+              "description": "pr-helper container of the virt-handler DaemonSet. Only applied when the PersistentReservation feature gate is enabled.",
+              "$ref": "#/definitions/resources"
+            },
+            "virtExportProxy": {
+              "description": "virt-exportproxy Deployment.",
+              "$ref": "#/definitions/resources"
+            },
+            "virtSynchronizationController": {
+              "description": "virt-synchronization-controller Deployment (DecentralizedLiveMigration feature gate).",
+              "$ref": "#/definitions/resources"
+            },
+            "virtTemplateApiserver": {
+              "description": "virt-template-apiserver Deployment (Template feature gate).",
+              "$ref": "#/definitions/resources"
+            },
+            "virtTemplateController": {
+              "description": "virt-template-controller Deployment (Template feature gate).",
+              "$ref": "#/definitions/resources"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "cpuQuantity": {
+      "title": "CPU Quantity",
+      "description": "Kubernetes CPU quantity (e.g. 100m, 1, 0.5).",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([eE][+-]?[0-9]+|m|k|M|G|T|P|E|Ki|Mi|Gi|Ti|Pi|Ei)?$"
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ]
+    },
+    "memoryQuantity": {
+      "title": "Memory Quantity",
+      "description": "Kubernetes memory quantity (e.g. 128Mi, 1Gi). The 'm' suffix is rejected: 128m would mean 0.128 bytes.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([eE][+-]?[0-9]+|k|M|G|T|P|E|Ki|Mi|Gi|Ti|Pi|Ei)?$"
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ]
+    },
+    "quantity": {
+      "title": "Quantity",
+      "description": "Kubernetes resource quantity.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([eE][+-]?[0-9]+|m|k|M|G|T|P|E|Ki|Mi|Gi|Ti|Pi|Ei)?$"
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ]
+    },
+    "resourceList": {
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "$ref": "#/definitions/cpuQuantity"
+        },
+        "memory": {
+          "$ref": "#/definitions/memoryQuantity"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/quantity"
+      },
+      "description": "Resource name to quantity (cpu, memory, ephemeral-storage, hugepages-*, ...).",
+      "title": "Resource List"
+    },
+    "resources": {
+      "title": "Resource Requirements",
+      "description": "CPU and memory resource requests and limits.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requests": {
+          "$ref": "#/definitions/resourceList"
+        },
+        "limits": {
+          "$ref": "#/definitions/resourceList"
+        },
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "resourcesWithoutClaims": {
+      "title": "Resource Requirements",
+      "description": "CPU and memory resource requests and limits (no claims).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requests": {
+          "$ref": "#/definitions/resourceList"
+        },
+        "limits": {
+          "$ref": "#/definitions/resourceList"
         }
       }
     }

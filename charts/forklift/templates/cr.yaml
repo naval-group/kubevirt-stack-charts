@@ -10,3 +10,19 @@ spec:
   feature_ui_plugin: "false"
   feature_validation: "true"
   feature_volume_populator: "true"
+  {{- /* cr.componentResources.<component>.<requests|limits>.<cpu|memory> -> <prefix>_container_<kind>_<res> */}}
+  {{- $prefixes := dict
+    "controller" "controller" "inventory" "inventory" "api" "api" "validation" "validation"
+    "ovaProxy" "ova_proxy" "populator" "populator" "virtV2v" "virt_v2v" "hooks" "hooks"
+    "ova" "ova" "hyperv" "hyperv" "cliDownload" "cli_download" "uiPlugin" "ui_plugin" "mcpServer" "mcp_server"
+  }}
+  {{- range $key := keys $prefixes | sortAlpha }}
+    {{- $r := get ($.Values.cr.componentResources | default dict) $key | default dict }}
+    {{- range $kind := list "limits" "requests" }}
+      {{- range $res := list "cpu" "memory" }}
+        {{- with dig $kind $res "" $r }}
+  {{ get $prefixes $key }}_container_{{ $kind }}_{{ $res }}: {{ . | toString | quote }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}

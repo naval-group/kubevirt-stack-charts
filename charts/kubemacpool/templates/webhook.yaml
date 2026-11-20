@@ -53,10 +53,10 @@ spec:
               value: {{ .Values.certManager.certRotateInterval | quote }}
             - name: CERT_OVERLAP_INTERVAL
               value: {{ .Values.certManager.certOverlapInterval | quote }}
+          {{- with .Values.certManager.resources }}
           resources:
-            requests:
-              cpu: 30m
-              memory: 30Mi
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

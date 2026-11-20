@@ -18,6 +18,32 @@ spec:
     podResourceRequirements:
       {{- toYaml . | nindent 6 }}
     {{- end }}
+  {{- /* cr.componentResources -> strategic-merge patches appended to cr.customizeComponents.patches */}}
+  {{- /* TODO: switch to upstream CDI CR fields for per-component resources once they are
+       implemented, and drop these generated patches. Container names below are tied to the
+       CDI version: re-check them when bumping .Values.version. */}}
+  {{- $targets := dict
+    "apiserver"   (dict "kind" "Deployment" "name" "cdi-apiserver" "container" "cdi-apiserver")
+    "controller"  (dict "kind" "Deployment" "name" "cdi-deployment" "container" "cdi-deployment")
+    "uploadProxy" (dict "kind" "Deployment" "name" "cdi-uploadproxy" "container" "cdi-uploadproxy")
+  }}
+  {{- $customize := deepCopy (.Values.cr.customizeComponents | default dict) }}
+  {{- $patches := $customize.patches | default list }}
+  {{- range $key := keys $targets | sortAlpha }}
+    {{- $t := get $targets $key }}
+    {{- with get ($.Values.cr.componentResources | default dict) $key }}
+      {{- $podSpec := dict "containers" (list (dict "name" $t.container "resources" .)) }}
+      {{- $patch := dict "spec" (dict "template" (dict "spec" $podSpec)) }}
+      {{- $patches = append $patches (dict "resourceType" $t.kind "resourceName" $t.name "type" "strategic" "patch" (toJson $patch)) }}
+    {{- end }}
+  {{- end }}
+  {{- if $patches }}
+    {{- $_ := set $customize "patches" $patches }}
+  {{- end }}
+  {{- with $customize }}
+  customizeComponents:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   imagePullPolicy: {{ .Values.cr.imagePullPolicy }}
   {{- with .Values.cr.priorityClass }}
   priorityClass: {{ . }}
