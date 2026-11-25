@@ -44,6 +44,10 @@ spec:
     permittedHostDevices:
       {{- toYaml . | nindent 6 }}
     {{- end }}
+    {{- with .Values.cr.configuration.seccompConfiguration }}
+    seccompConfiguration:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
     imagePullPolicy: {{ .Values.cr.imagePullPolicy }}
   {{- with .Values.cr.customizeComponents }}
   customizeComponents:
