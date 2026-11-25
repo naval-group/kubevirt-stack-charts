@@ -54,6 +54,18 @@ cr:
     liveUpdateConfiguration: {}
     evictionStrategy: ""
     permittedHostDevices: {}
+    ## Seccomp profile for virt-launcher pods.
+    ## Example (kubevirt/kubevirt.json is the profile virt-handler installs on nodes):
+    ##   seccompConfiguration:
+    ##     virtualMachineInstanceProfile:
+    ##       customProfile:
+    ##         localhostProfile: kubevirt/kubevirt.json
+    ## or:
+    ##   seccompConfiguration:
+    ##     virtualMachineInstanceProfile:
+    ##       customProfile:
+    ##         runtimeDefaultProfile: true
+    seccompConfiguration: {}
     ## Mediated devices configuration for vGPU passthrough.
     ## Example:
     ##   mediatedDevicesConfiguration:

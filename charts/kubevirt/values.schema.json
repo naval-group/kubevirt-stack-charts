@@ -442,6 +442,41 @@
                   "$ref": "#/definitions/resourcesWithoutClaims"
                 }
               }
+            },
+            "seccompConfiguration": {
+              "title": "Seccomp Configuration",
+              "description": "Seccomp profile configuration for KubeVirt components. Set virtualMachineInstanceProfile.customProfile to apply a seccomp profile to virt-launcher pods.",
+              "type": "object",
+              "default": {},
+              "additionalProperties": false,
+              "properties": {
+                "virtualMachineInstanceProfile": {
+                  "title": "Virtual Machine Instance Profile",
+                  "description": "Seccomp profile used by virt-launcher. Defaults to none.",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "customProfile": {
+                      "title": "Custom Profile",
+                      "description": "Arbitrary seccomp profile for virt-launcher. Set either localhostProfile or runtimeDefaultProfile.",
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "localhostProfile": {
+                          "title": "Localhost Profile",
+                          "description": "Path of a seccomp profile on the node, relative to the kubelet seccomp directory (e.g. kubevirt/kubevirt.json).",
+                          "type": "string"
+                        },
+                        "runtimeDefaultProfile": {
+                          "title": "Runtime Default Profile",
+                          "description": "Use the container runtime's default seccomp profile.",
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         },

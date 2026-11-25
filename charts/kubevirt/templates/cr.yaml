@@ -59,6 +59,10 @@ spec:
     supportContainerResources:
       {{- toYaml . | nindent 6 }}
     {{- end }}
+    {{- with .Values.cr.configuration.seccompConfiguration }}
+    seccompConfiguration:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
     imagePullPolicy: {{ .Values.cr.imagePullPolicy }}
   {{- /* cr.componentResources -> strategic-merge patches appended to cr.customizeComponents.patches */}}
   {{- /* TODO: switch to upstream KubeVirt CR fields for per-component resources once they are
