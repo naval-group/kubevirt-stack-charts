@@ -22,10 +22,21 @@ image:
   repository: ghcr.io/k8snetworkplumbingwg/multus-cni
   tag: v4.1.4
 
+## Resources for the multus container (thick or thin).
+## Not applied in RKE2 mode: rke2-multus gates multus and DNC resources behind a
+## single pod.resources.enabled flag, and its DNC template mis-indents them
+## (rejected by strict validation), so they are not passed through.
 resources:
   requests:
     cpu: 10m
     memory: 50Mi
+
+## Thin plugin only (thick=false): install-multus-binary init container
+initContainer:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 15Mi
 
 tolerations:
   - operator: Exists

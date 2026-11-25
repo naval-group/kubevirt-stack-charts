@@ -16,6 +16,37 @@ operator:
   tolerations: []
   priorityClassName: ""
 
+## ForkliftController CR settings.
+cr:
+  ## Resource requests/limits for components deployed by forklift-operator.
+  ## Empty = operator defaults. Rendered as <component>_container_<requests|limits>_<cpu|memory>
+  ## fields of the ForkliftController spec.
+  ## Example:
+  ##   controller:
+  ##     requests: {cpu: 100m, memory: 350Mi}
+  ##     limits: {cpu: "1", memory: 1Gi}
+  componentResources:
+    ## forklift-controller "main" container
+    controller: {}
+    ## forklift-controller "inventory" container
+    inventory: {}
+    api: {}
+    validation: {}
+    ovaProxy: {}
+    ## Populator pods spawned during migrations. The forklift-volume-populator-controller
+    ## Deployment itself has no resources setting upstream.
+    populator: {}
+    ## Migration pods
+    virtV2v: {}
+    hooks: {}
+    ## Provider servers
+    ova: {}
+    hyperv: {}
+    ## Optional UI components
+    cliDownload: {}
+    uiPlugin: {}
+    mcpServer: {}
+
 ## Trusted CA bundle for Forklift Provider connections.
 ## If your source clusters use certificates signed by a corporate CA,
 ## provide the PEM-encoded CA bundle here. A ConfigMap will be created

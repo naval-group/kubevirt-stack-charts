@@ -62,6 +62,10 @@ spec:
             - cp
             - /usr/src/multus-cni/bin/multus-shim
             - /host/opt/cni/bin/multus-shim
+          {{- with .Values.initContainer.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: cni-bin-dir
               mountPath: /host/opt/cni/bin

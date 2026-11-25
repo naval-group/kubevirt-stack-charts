@@ -322,6 +322,62 @@
               }
             }
           }
+        },
+        "componentResources": {
+          "title": "Component Resources",
+          "description": "Resource requests/limits for the CDI control plane, rendered as customizeComponents patches. Empty = operator defaults.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "apiserver": {
+              "description": "cdi-apiserver Deployment.",
+              "$ref": "#/definitions/resources"
+            },
+            "controller": {
+              "description": "cdi-deployment Deployment.",
+              "$ref": "#/definitions/resources"
+            },
+            "uploadProxy": {
+              "description": "cdi-uploadproxy Deployment.",
+              "$ref": "#/definitions/resources"
+            }
+          }
+        },
+        "customizeComponents": {
+          "title": "Customize Components",
+          "description": "Raw customizeComponents (patches/flags) passed to the operator CR. Patches generated from componentResources are appended.",
+          "type": "object",
+          "properties": {
+            "patches": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "resourceName",
+                  "resourceType",
+                  "patch",
+                  "type"
+                ],
+                "properties": {
+                  "resourceName": {
+                    "type": "string"
+                  },
+                  "resourceType": {
+                    "type": "string"
+                  },
+                  "patch": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "flags": {
+              "type": "object"
+            }
+          }
         }
       }
     },
@@ -365,6 +421,86 @@
                 }
               }
             }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "cpuQuantity": {
+      "title": "CPU Quantity",
+      "description": "Kubernetes CPU quantity (e.g. 100m, 1, 0.5).",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([eE][+-]?[0-9]+|m|k|M|G|T|P|E|Ki|Mi|Gi|Ti|Pi|Ei)?$"
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ]
+    },
+    "memoryQuantity": {
+      "title": "Memory Quantity",
+      "description": "Kubernetes memory quantity (e.g. 128Mi, 1Gi). The 'm' suffix is rejected: 128m would mean 0.128 bytes.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([eE][+-]?[0-9]+|k|M|G|T|P|E|Ki|Mi|Gi|Ti|Pi|Ei)?$"
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ]
+    },
+    "quantity": {
+      "title": "Quantity",
+      "description": "Kubernetes resource quantity.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([eE][+-]?[0-9]+|m|k|M|G|T|P|E|Ki|Mi|Gi|Ti|Pi|Ei)?$"
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ]
+    },
+    "resourceList": {
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "$ref": "#/definitions/cpuQuantity"
+        },
+        "memory": {
+          "$ref": "#/definitions/memoryQuantity"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/quantity"
+      },
+      "description": "Resource name to quantity (cpu, memory, ephemeral-storage, hugepages-*, ...).",
+      "title": "Resource List"
+    },
+    "resources": {
+      "title": "Resource Requirements",
+      "description": "CPU and memory resource requests and limits.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requests": {
+          "$ref": "#/definitions/resourceList"
+        },
+        "limits": {
+          "$ref": "#/definitions/resourceList"
+        },
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object"
           }
         }
       }

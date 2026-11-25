@@ -44,12 +44,61 @@ spec:
     permittedHostDevices:
       {{- toYaml . | nindent 6 }}
     {{- end }}
+    {{- /* map keyed by support container type -> upstream list of {type, resources} */}}
+    {{- $supportTypes := dict
+      "containerDisk" "container-disk" "hotplugDisk" "hotplug-disk" "virtiofs" "virtiofs"
+      "sidecar" "sidecar" "vmExport" "vmexport" "guestConsoleLog" "guest-console-log"
+    }}
+    {{- $support := list }}
+    {{- range $key := keys $supportTypes | sortAlpha }}
+      {{- with get ($.Values.cr.configuration.supportContainerResources | default dict) $key }}
+        {{- $support = append $support (dict "type" (get $supportTypes $key) "resources" .) }}
+      {{- end }}
+    {{- end }}
+    {{- with $support }}
+    supportContainerResources:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
     {{- with .Values.cr.configuration.seccompConfiguration }}
     seccompConfiguration:
       {{- toYaml . | nindent 6 }}
     {{- end }}
     imagePullPolicy: {{ .Values.cr.imagePullPolicy }}
-  {{- with .Values.cr.customizeComponents }}
+  {{- /* cr.componentResources -> strategic-merge patches appended to cr.customizeComponents.patches */}}
+  {{- /* TODO: switch to upstream KubeVirt CR fields for per-component resources once they are
+       implemented, and drop these generated patches. Container names below are tied to the
+       KubeVirt version: re-check them when bumping .Values.version. */}}
+  {{- $targets := dict
+    "virtApi"                (dict "kind" "Deployment" "name" "virt-api" "container" "virt-api")
+    "virtController"         (dict "kind" "Deployment" "name" "virt-controller" "container" "virt-controller")
+    "virtHandler"            (dict "kind" "DaemonSet" "name" "virt-handler" "container" "virt-handler")
+    "virtHandlerInit"        (dict "kind" "DaemonSet" "name" "virt-handler" "container" "virt-launcher" "init" true)
+    "virtHandlerPrHelper"    (dict "kind" "DaemonSet" "name" "virt-handler" "container" "pr-helper" "featureGate" "PersistentReservation")
+    "virtExportProxy"        (dict "kind" "Deployment" "name" "virt-exportproxy" "container" "exportproxy")
+    "virtSynchronizationController" (dict "kind" "Deployment" "name" "virt-synchronization-controller" "container" "sync")
+    "virtTemplateApiserver"  (dict "kind" "Deployment" "name" "virt-template-apiserver" "container" "apiserver")
+    "virtTemplateController" (dict "kind" "Deployment" "name" "virt-template-controller" "container" "manager")
+  }}
+  {{- $customize := deepCopy (.Values.cr.customizeComponents | default dict) }}
+  {{- $patches := $customize.patches | default list }}
+  {{- $featureGates := .Values.cr.configuration.developerConfiguration.featureGates | default list }}
+  {{- range $key := keys $targets | sortAlpha }}
+    {{- $t := get $targets $key }}
+    {{- /* A strategic-merge patch for a container that does not exist adds it without an image
+         and breaks the DaemonSet: skip containers whose feature gate is off. */}}
+    {{- if or (not (hasKey $t "featureGate")) (has $t.featureGate $featureGates) }}
+    {{- with get ($.Values.cr.componentResources | default dict) $key }}
+      {{- $field := ternary "initContainers" "containers" (hasKey $t "init") }}
+      {{- $podSpec := dict $field (list (dict "name" $t.container "resources" .)) }}
+      {{- $patch := dict "spec" (dict "template" (dict "spec" $podSpec)) }}
+      {{- $patches = append $patches (dict "resourceType" $t.kind "resourceName" $t.name "type" "strategic" "patch" (toJson $patch)) }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- if $patches }}
+    {{- $_ := set $customize "patches" $patches }}
+  {{- end }}
+  {{- with $customize }}
   customizeComponents:
     {{- toYaml . | nindent 4 }}
   {{- end }}

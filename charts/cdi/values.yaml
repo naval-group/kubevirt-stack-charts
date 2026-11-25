@@ -47,6 +47,19 @@ cr:
     ##       memory: 512Mi
     podResourceRequirements: {}
   imagePullPolicy: IfNotPresent
+  ## Resource requests/limits for the CDI control plane deployed by cdi-operator.
+  ## Empty = operator defaults. Each entry is rendered as a strategic-merge
+  ## patch in customizeComponents.patches (appended to any patches below).
+  ## Example:
+  ##   controller:
+  ##     requests: {cpu: 100m, memory: 150Mi}
+  ##     limits: {memory: 512Mi}
+  componentResources:
+    apiserver: {}
+    controller: {}
+    uploadProxy: {}
+  ## Raw CDI customizeComponents (patches / flags).
+  customizeComponents: {}
   ## PriorityClass applied to the whole CDI control plane (cdi-apiserver, cdi-controller, cdi-uploadproxy).
   priorityClass: ""
   infra:
