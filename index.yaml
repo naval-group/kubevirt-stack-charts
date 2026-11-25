@@ -43,6 +43,21 @@ entries:
   butane-operator:
   - apiVersion: v2
     appVersion: 0.1.1-rc2
+    created: "2026-11-25T16:23:02.767315401Z"
+    description: Butane Operator — converts Butane YAML to Ignition JSON for CoreOS
+      VMs
+    digest: 04c014569f53d7cb35d79a687ed414954dc79163f13299b7fd28d19f6c0fca08
+    icon: https://raw.githubusercontent.com/Naval-Group/butane-operator/main/assets/logo.png
+    kubeVersion: '>=1.30.0-0'
+    name: butane-operator
+    sources:
+    - https://github.com/naval-group/butane-operator
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.5.0/butane-operator-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
+    appVersion: 0.1.1-rc2
     created: "2026-10-19T19:46:07.566119305Z"
     description: Butane Operator — converts Butane YAML to Ignition JSON for CoreOS
       VMs
@@ -87,6 +102,21 @@ entries:
     - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/butane-operator-0.2.0.tgz
     version: 0.2.0
   cdi:
+  - apiVersion: v2
+    appVersion: 1.65.0
+    created: "2026-11-25T16:23:02.770026546Z"
+    description: Containerized Data Importer — disk image management for KubeVirt
+    digest: b343c8f101b239b941b42398ec0cf6ab9dd2df587a5f5790e495412b32c0f0a7
+    home: https://kubevirt.io
+    icon: https://raw.githubusercontent.com/kubevirt/containerized-data-importer/main/assets/cdi_logo.png
+    kubeVersion: '>=1.30.0-0'
+    name: cdi
+    sources:
+    - https://github.com/kubevirt/containerized-data-importer
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.5.0/cdi-0.5.0.tgz
+    version: 0.5.0
   - apiVersion: v2
     appVersion: 1.65.0
     created: "2026-10-19T19:46:07.569319761Z"
@@ -160,6 +190,20 @@ entries:
     - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.2.0/cloud-provider-kubevirt-0.2.0.tgz
     version: 0.2.0
   forklift:
+  - apiVersion: v2
+    appVersion: release-2.12
+    created: "2026-11-25T16:23:02.775972878Z"
+    description: Forklift — VM migration from VMware/oVirt/OpenStack to KubeVirt
+    digest: 6b9b071a495dcbfc93b119c3370787b2d00a88158fb8bbbeec05b4e1c5d33668
+    icon: https://raw.githubusercontent.com/konveyor/website/main/src/images/forklift.svg
+    kubeVersion: '>=1.30.0-0'
+    name: forklift
+    sources:
+    - https://github.com/kubev2v/forklift
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.5.0/forklift-0.5.0.tgz
+    version: 0.5.0
   - apiVersion: v2
     appVersion: release-2.12
     created: "2026-10-19T19:46:07.573540579Z"
@@ -245,6 +289,19 @@ entries:
   kubemacpool:
   - apiVersion: v2
     appVersion: 0.51.1
+    created: "2026-11-25T16:23:02.77634414Z"
+    description: KubeMacPool — MAC address management for KubeVirt VMs
+    digest: 58cbf6158b546efa761be766cfe4c83b9abef4b99218090a8b367b1c244644f0
+    kubeVersion: '>=1.30.0-0'
+    name: kubemacpool
+    sources:
+    - https://github.com/kubevirt/kubemacpool
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.5.0/kubemacpool-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
+    appVersion: 0.51.1
     created: "2026-10-19T19:46:07.575287601Z"
     description: KubeMacPool — MAC address management for KubeVirt VMs
     digest: 7b4d96d3b05714c46bdb57648147a2864943abaaea7e50c352a14334167fbacd
@@ -283,6 +340,21 @@ entries:
     - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/kubemacpool-0.2.0.tgz
     version: 0.2.0
   kubevirt:
+  - apiVersion: v2
+    appVersion: 1.8.4
+    created: "2026-11-25T16:23:02.780259748Z"
+    description: KubeVirt operator and CR — core VM lifecycle management
+    digest: bc11c0b7a95932793e9123031afa2c4f689b7a65da998a0d6c004ac89195e052
+    home: https://kubevirt.io
+    icon: https://raw.githubusercontent.com/cncf/artwork/main/projects/kubevirt/icon/color/kubevirt-icon-color.svg
+    kubeVersion: '>=1.30.0-0'
+    name: kubevirt
+    sources:
+    - https://github.com/kubevirt/kubevirt
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.5.0/kubevirt-0.4.0.tgz
+    version: 0.4.0
   - apiVersion: v2
     appVersion: 1.8.4
     created: "2026-10-19T19:46:07.5780445Z"
@@ -413,6 +485,22 @@ entries:
   multus:
   - apiVersion: v2
     appVersion: 4.1.4
+    created: "2026-11-25T16:23:02.780688585Z"
+    description: Multus CNI with thick plugin and dynamic networks controller for
+      KubeVirt
+    digest: e67c93a12105d537dc12a58ff5924ee9e30bc5e4f03c636c1659e65712fb9bb7
+    icon: https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/docs/images/Multus.png
+    kubeVersion: '>=1.30.0-0'
+    name: multus
+    sources:
+    - https://github.com/k8snetworkplumbingwg/multus-cni
+    - https://github.com/k8snetworkplumbingwg/multus-dynamic-networks-controller
+    type: application
+    urls:
+    - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.5.0/multus-0.4.0.tgz
+    version: 0.4.0
+  - apiVersion: v2
+    appVersion: 4.1.4
     created: "2026-10-19T19:46:07.579550508Z"
     description: Multus CNI with thick plugin and dynamic networks controller for
       KubeVirt
@@ -513,4 +601,4 @@ entries:
     urls:
     - https://github.com/naval-group/kubevirt-stack-charts/releases/download/v0.3.0/whereabouts-0.2.0.tgz
     version: 0.2.0
-generated: "2026-10-19T19:46:07.563399936Z"
+generated: "2026-11-25T16:23:02.766648982Z"
